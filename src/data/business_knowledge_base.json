@@ -1,0 +1,26 @@
+{
+    "marketability_filters": [
+        "혼자 해결하기 어려운가?",
+        "급하거나 고통스러운가?",
+        "돈을 낸 사례가 존재하는가?",
+        "무료로 대체 불가능한가?"
+    ],
+    "recommendation_logic": {
+        "capital_low": [
+            "지식 서비스",
+            "제휴 마케팅"
+        ],
+        "capital_high": [
+            "커머스",
+            "인프라 사업"
+        ],
+        "skill_content": [
+            "블로그/SNS 채널",
+            "전자책 발행"
+        ],
+        "skill_sales": [
+            "B2B 대행",
+            "고단가 컨설팅"
+        ]
+    }
+}

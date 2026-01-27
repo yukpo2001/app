@@ -1,0 +1,69 @@
+{
+    "knowledge": {
+        "title": "지식형 비즈니스 퍼널",
+        "stages": [
+            {
+                "name": "Problem Aware",
+                "content": "타겟의 고통을 건드리는 칼럼/영상"
+            },
+            {
+                "name": "Emotion Trigger",
+                "content": "자신의 실패와 극복 스토리텔링"
+            },
+            {
+                "name": "Vision Building",
+                "content": "성공 로드맵 및 무료 전자책 제공"
+            },
+            {
+                "name": "Choice",
+                "content": "미니 코칭 또는 VOD 클래스 제안"
+            },
+            {
+                "name": "Conversion",
+                "content": "고단가 컨설팅/마스터클래스 전환"
+            }
+        ]
+    },
+    "service": {
+        "title": "서비스형 비즈니스 퍼널",
+        "stages": [
+            {
+                "name": "Trust Building",
+                "content": "전문성을 보여주는 포트폴리오/사례"
+            },
+            {
+                "name": "Lead Magnet",
+                "content": "무료 진단/상담 신청"
+            },
+            {
+                "name": "Value Delivery",
+                "content": "상담을 통한 커스텀 제안"
+            },
+            {
+                "name": "Conversion",
+                "content": "정기 구독 또는 프로젝트 계약"
+            }
+        ]
+    },
+    "product": {
+        "title": "실물형 비즈니스 퍼널",
+        "stages": [
+            {
+                "name": "Attention",
+                "content": "제품의 사용 전후(Before/After) 영상"
+            },
+            {
+                "name": "Social Proof",
+                "content": "실제 구매 고객의 리얼 후기"
+            },
+            {
+                "name": "Urgency",
+                "content": "한정 수량 또는 타임 세일"
+            },
+            {
+                "name": "Purchase",
+                "content": "상세페이지를 통한 즉시 결제"
+            }
+        ]
+    }
+}

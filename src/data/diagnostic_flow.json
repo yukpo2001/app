@@ -1,0 +1,82 @@
+[
+  {
+    "id": "q1",
+    "title": "사업 아이템을 찾는 이유",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "existing", "label": "기존 사업에 세일즈 퍼널 적용", "next": "q2_1" },
+      { "value": "new", "label": "처음이라 쉽게 시작하고 싶다", "next": "q2_2" }
+    ]
+  },
+  {
+    "id": "q2_1",
+    "title": "현재 어떤 사업을 하고 계신가요?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "knowledge", "label": "지식 서비스 (강의, 코칭)", "next": "q3" },
+      { "value": "service", "label": "전문 서비스 (대행, 상담)", "next": "q3" },
+      { "value": "product", "label": "실물 제품 판매", "next": "q3" }
+    ]
+  },
+  {
+    "id": "q2_2",
+    "title": "가장 관심 있는 분야는 무엇인가요?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "knowledge", "label": "나의 지식/경험 판매", "next": "q3" },
+      { "value": "affiliate", "label": "타인의 제품 홍보/중개", "next": "q3" },
+      { "value": "ecommerce", "label": "쇼핑몰/커머스", "next": "q3" }
+    ]
+  },
+  {
+    "id": "q3",
+    "title": "현재 가용한 초기 자본은 어느 정도인가요?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "zero", "label": "0원 (무자본)", "next": "q4" },
+      { "value": "low", "label": "100만원 미만", "next": "q4" },
+      { "value": "mid", "label": "100만원 ~ 500만원", "next": "q4" },
+      { "value": "high", "label": "500만원 이상", "next": "q4" }
+    ]
+  },
+  {
+    "id": "q4",
+    "title": "하루에 사업에 투자할 수 있는 시간은?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "part", "label": "2시간 이내 (부업형)", "next": "q5" },
+      { "value": "half", "label": "4~6시간 (집중형)", "next": "q5" },
+      { "value": "full", "label": "8시간 이상 (올인형)", "next": "q5" }
+    ]
+  },
+  {
+    "id": "q5",
+    "title": "현재 운영 중인 SNS 채널이 있나요?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "yes", "label": "예 (인스타, 블로그, 유튜브 등)", "next": "q6" },
+      { "value": "no", "label": "아니오 (새로 시작해야 함)", "next": "q6" }
+    ]
+  },
+  {
+    "id": "q6",
+    "title": "자신의 가장 큰 강점은 무엇인가요?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "content", "label": "글쓰기/콘텐츠 제작", "next": "q7" },
+      { "value": "sales", "label": "말하기/세일즈", "next": "q7" },
+      { "value": "tech", "label": "IT/기술/디자인", "next": "q7" },
+      { "value": "none", "label": "아직 잘 모르겠음", "next": "q7" }
+    ]
+  },
+  {
+    "id": "q7",
+    "title": "희망하는 월 수익 목표는?",
+    "type": "multiple_choice",
+    "options": [
+      { "value": "goal_low", "label": "100~300만원", "next": null },
+      { "value": "goal_mid", "label": "300~1000만원", "next": null },
+      { "value": "goal_high", "label": "1000만원 이상", "next": null }
+    ]
+  }
+]

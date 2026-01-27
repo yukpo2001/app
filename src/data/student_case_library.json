@@ -1,0 +1,35 @@
+[
+    {
+        "id": "case_01",
+        "title": "월 1,000만원 수익 지식 창업가 A",
+        "profile": {
+            "capital": "zero",
+            "skill": "content",
+            "interest": "knowledge"
+        },
+        "item": "전자책 + 자동화 퍼널 마케팅",
+        "summary": "무자본으로 시작하여 자신의 노하우를 전자책으로 발행, 인스타그램을 통해 유입을 유도하여 자동화 퍼널을 구축함."
+    },
+    {
+        "id": "case_02",
+        "title": "부업으로 성공한 구매대행 B",
+        "profile": {
+            "capital": "low",
+            "skill": "tech",
+            "interest": "ecommerce"
+        },
+        "item": "반자동 구매대행 시스템",
+        "summary": "직장 생활 중 하루 3시간 투자로 IT 기술을 활용해 상품 등록을 자동화하여 월 300만원의 추가 수익 달성."
+    },
+    {
+        "id": "case_03",
+        "title": "전문성을 세일즈로 연결한 C",
+        "profile": {
+            "capital": "mid",
+            "skill": "sales",
+            "interest": "service"
+        },
+        "item": "B2B 마케팅 대행 서비스",
+        "summary": "기존 대면 영업 방식을 온라인 상담 퍼널로 전환하여 영업 효율을 5배 이상 높이고 고단가 계약 체결."
+    }
+]
