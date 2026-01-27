@@ -1,0 +1,106 @@
+[
+    {
+        "id": "biz_industry",
+        "title": "현재 운영 중인(혹은 계획 중인) 사업의 업종은 무엇인가요?",
+        "type": "single_choice",
+        "options": [
+            {
+                "value": "restaurant",
+                "label": "요식업/카페 (Restaurant/Cafe)",
+                "next": "biz_problem"
+            },
+            {
+                "value": "retail",
+                "label": "소매/유통 (Retail)",
+                "next": "biz_problem"
+            },
+            {
+                "value": "service",
+                "label": "전문 서비스/교육 (Service/Education)",
+                "next": "biz_problem"
+            },
+            {
+                "value": "ecommerce",
+                "label": "온라인 쇼핑몰 (E-commerce)",
+                "next": "biz_problem"
+            }
+        ]
+    },
+    {
+        "id": "biz_problem",
+        "title": "현재 가장 해결하고 싶은 문제는 무엇인가요?",
+        "type": "single_choice",
+        "options": [
+            {
+                "value": "low_conversion",
+                "label": "매출 부진: 방문객은 있는데 구매 전환이 안 됨",
+                "next": "biz_resource"
+            },
+            {
+                "value": "low_awareness",
+                "label": "유입 부족: 브랜드를 아는 사람이 적음",
+                "next": "biz_resource"
+            },
+            {
+                "value": "price_sensitivity",
+                "label": "가격 저항: 고객이 비싸다고 느낌",
+                "next": "biz_resource"
+            },
+            {
+                "value": "low_retention",
+                "label": "재방문 저조: 한 번 오고 다시 안 옴",
+                "next": "biz_resource"
+            }
+        ]
+    },
+    {
+        "id": "biz_resource",
+        "title": "경쟁사와 비교했을 때 사장님만의 강점은 무엇인가요? (최대 2개)",
+        "type": "multiple_choice",
+        "maxSelections": 2,
+        "options": [
+            {
+                "value": "cost_leadership",
+                "label": "압도적인 가성비/원가 경쟁력",
+                "next": "target_type"
+            },
+            {
+                "value": "quality",
+                "label": "독보적인 기술/맛/품질",
+                "next": "target_type"
+            },
+            {
+                "value": "trust",
+                "label": "오랜 경력/신뢰도/네트워크",
+                "next": "target_type"
+            },
+            {
+                "value": "design",
+                "label": "트렌디한 인테리어/디자인",
+                "next": "target_type"
+            }
+        ]
+    },
+    {
+        "id": "target_type",
+        "title": "주 타겟 고객층의 성향은 어떤가요?",
+        "type": "single_choice",
+        "options": [
+            {
+                "value": "price_conscious",
+                "label": "가격에 민감하고 실용성을 중시함",
+                "next": null
+            },
+            {
+                "value": "experience_focused",
+                "label": "경험과 감성을 중시하고 유행에 민감함",
+                "next": null
+            },
+            {
+                "value": "safety_trust",
+                "label": "안전과 신뢰, 검증된 정보를 중시함",
+                "next": null
+            }
+        ]
+    }
+]

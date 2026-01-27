@@ -24,7 +24,7 @@ export default function LandingPage() {
           당신에게 최적화된<br />비즈니스 로드맵을 찾으세요
         </h1>
         <p className="text-lg md:text-xl text-gray-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-          자본, 경험, 역량을 분석하여 현재 당신이 가장 빠르게 성과를 낼 수 있는 
+          자본, 경험, 역량을 분석하여 현재 당신이 가장 빠르게 성과를 낼 수 있는
           비즈니스 아이템과 맞춤형 세일즈 퍼널 전략을 제안합니다.
         </p>
 
