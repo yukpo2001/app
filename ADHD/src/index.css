@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  background-color: #0B0F19;
+  color: white;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.neon-glow-cyan {
+  box-shadow: 0 0 15px rgba(6, 182, 212, 0.5);
+}
+
+.neon-text-cyan {
+  text-shadow: 0 0 10px rgba(6, 182, 212, 0.8);
+}
+
+@keyframes stars {
+  from { transform: translateY(0); }
+  to { transform: translateY(-1000px); }
+}
+
+.stars-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  background: radial-gradient(1px 1px at 20% 30%, white, transparent),
+              radial-gradient(1px 1px at 40% 70%, white, transparent),
+              radial-gradient(1px 1px at 50% 10%, white, transparent),
+              radial-gradient(1px 1px at 80% 40%, white, transparent),
+              radial-gradient(1px 1px at 90% 80%, white, transparent);
+  background-size: 550px 550px;
+  animation: stars 100s linear infinite;
+  z-index: -1;
+  opacity: 0.3;
+}
