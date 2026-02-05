@@ -4,7 +4,7 @@ import { rankPlacesByTaste } from "./recommendation";
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-export async function getPlacesRecommendations(keyword: string) {
+export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }) {
     if (!GOOGLE_MAPS_API_KEY) {
         console.error("GOOGLE_MAPS_API_KEY is not defined");
         return [];
@@ -13,6 +13,24 @@ export async function getPlacesRecommendations(keyword: string) {
     const url = "https://places.googleapis.com/v1/places:searchText";
 
     try {
+        const body: any = {
+            textQuery: keyword,
+            languageCode: "ko",
+            maxResultCount: 6,
+        };
+
+        if (location) {
+            body.locationBias = {
+                circle: {
+                    center: {
+                        latitude: location.lat,
+                        longitude: location.lng
+                    },
+                    radius: 5000.0 // 5km search radius
+                }
+            };
+        }
+
         const response = await fetch(url, {
             method: "POST",
             headers: {
@@ -20,11 +38,7 @@ export async function getPlacesRecommendations(keyword: string) {
                 "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
                 "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews"
             },
-            body: JSON.stringify({
-                textQuery: keyword,
-                languageCode: "ko",
-                maxResultCount: 6,
-            }),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {

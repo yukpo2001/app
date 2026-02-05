@@ -104,7 +104,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                     <Star className="w-4 h-4 text-primary" />
                                     <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Real User Reviews</p>
                                 </div>
-                                <div className="space-y-6 max-h-60 overflow-y-auto pr-4 custom-scrollbar">
+                                <div className="space-y-6 max-h-40 overflow-y-auto pr-4 custom-scrollbar mb-6">
                                     {place.reviews && place.reviews.length > 0 ? (
                                         place.reviews.map((rev: any, i: number) => (
                                             <div key={i} className="border-b border-black/5 last:border-0 pb-4 last:pb-0">
@@ -124,6 +124,27 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                         <p className="text-sm text-gray-400 italic text-center py-4">표시할 리뷰가 없습니다.</p>
                                     )}
                                 </div>
+
+                                {/* Lumi's Personalized Tip */}
+                                {place.lumiTip && (
+                                    <div className="relative mt-8 pt-8 border-t border-black/5 flex items-start gap-6">
+                                        <div className="w-20 shrink-0">
+                                            <img src="/lumi_avatar.png" alt="Lumi" className="w-full h-auto drop-shadow-md" onError={(e) => {
+                                                // Fallback if avatar doesn't exist yet
+                                                (e.target as any).style.display = 'none';
+                                            }} />
+                                        </div>
+                                        <div className="flex-1 bg-primary/10 border border-primary/20 p-5 rounded-2xl rounded-tl-none relative animate-in fade-in slide-in-from-left-4 duration-500">
+                                            <div className="absolute -left-3 top-0 border-[12px] border-transparent border-t-primary/10 border-r-primary/10" />
+                                            <p className="text-xs font-bold text-primary mb-1 uppercase tracking-wider flex items-center gap-1">
+                                                <Star className="w-3 h-3" /> Lumi's Special Tip
+                                            </p>
+                                            <p className="text-sm font-medium text-primary/80 leading-relaxed">
+                                                {place.lumiTip}
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
 
                             <a

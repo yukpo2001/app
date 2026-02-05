@@ -14,6 +14,7 @@ export interface Place {
     mapUrl: string;
     imageUrl: string;
     tasteScore?: number;
+    lumiTip?: string;
 }
 
 export const rankPlacesByTaste = (places: Place[]) => {
@@ -49,6 +50,18 @@ export const rankPlacesByTaste = (places: Place[]) => {
             score += matches.length * 0.05;
         });
 
-        return { ...place, tasteScore: Math.round(score * 10) / 10 };
+        // 4. Generate Lumi's Tip
+        let tip = "여기는 yukpo2001님이 좋아하실 만한 분위기에요!";
+        if (score > 10) {
+            tip = "완전 yukpo2001님 스타일! 평소 좋아하시는 정갈하고 깔끔한 분위기가 가득해요. ✨";
+        } else if (allReviewsText.includes("친절") || allReviewsText.includes("서비스")) {
+            tip = "친절한 서비스로 유명한 곳이에요. yukpo2001님이 중요하게 생각하시는 부분이죠! 😊";
+        } else if (allReviewsText.includes("조용") || allReviewsText.includes("여유")) {
+            tip = "조용하게 시간을 보내기 좋은 곳이에요. 혼자만의 시간을 선호하시는 취향에 딱! 🍃";
+        } else if (allReviewsText.includes("힙한") || allReviewsText.includes("감성")) {
+            tip = "요즘 힙한 감성이 가득한 곳이에요. yukpo2001님의 세련된 감각과 잘 어울려요! 💖";
+        }
+
+        return { ...place, tasteScore: Math.round(score * 10) / 10, lumiTip: tip };
     }).sort((a, b) => (b.tasteScore || 0) - (a.tasteScore || 0));
 };

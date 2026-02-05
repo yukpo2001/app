@@ -27,13 +27,14 @@ export default function Home() {
   const [selectedPlace, setSelectedPlace] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [diagnoseStep, setDiagnoseStep] = useState(1);
+  const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
 
   const toggleLanguage = () => {
     setLanguage(language === "ko" ? "en" : "ko");
   };
 
-  const startAnalysis = async () => {
-    if (!keyword.trim()) return;
+  const startAnalysis = async (customLocation?: { lat: number; lng: number }) => {
+    if (!keyword.trim() && !customLocation) return;
 
     setIsAnalyzing(true);
     const phrases = [
@@ -51,7 +52,8 @@ export default function Home() {
     }, 1200);
 
     try {
-      const results = await getPlacesRecommendations(keyword);
+      const searchKeyword = keyword.trim() || "추천 장소";
+      const results = await getPlacesRecommendations(searchKeyword, customLocation || location || undefined);
       setRecommendations(results);
       setDiagnoseStep(2);
     } catch (error) {
@@ -59,6 +61,30 @@ export default function Home() {
     } finally {
       clearInterval(interval);
       setIsAnalyzing(false);
+    }
+  };
+
+  const handleNearbySearch = () => {
+    if ("geolocation" in navigator) {
+      setIsAnalyzing(true);
+      setAnalysisText("현재 위치를 확인하고 있어요...");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setLocation(loc);
+          startAnalysis(loc);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          alert("위치 정보를 가져올 수 없습니다. 기본 검색으로 진행해 주세요.");
+          setIsAnalyzing(false);
+        }
+      );
+    } else {
+      alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
     }
   };
 
@@ -188,7 +214,7 @@ export default function Home() {
                   </div>
 
                   <button
-                    onClick={startAnalysis}
+                    onClick={() => startAnalysis()}
                     disabled={isAnalyzing || !keyword.trim()}
                     className="btn-primary w-full flex items-center justify-center gap-2 py-5 text-lg"
                   >
@@ -204,6 +230,16 @@ export default function Home() {
                       </>
                     )}
                   </button>
+
+                  {!isAnalyzing && (
+                    <button
+                      onClick={handleNearbySearch}
+                      className="mt-4 w-full flex items-center justify-center gap-2 py-4 text-secondary font-bold bg-secondary/10 hover:bg-secondary/20 rounded-[1.5rem] transition-all border border-secondary/20"
+                    >
+                      <MapPin className="w-5 h-5" />
+                      <span>내 주변 힙한 곳 바로 찾기</span>
+                    </button>
+                  )}
                   <button
                     onClick={handleGoToLanding}
                     className="mt-6 text-gray-400 hover:text-gray-600 transition-colors"
