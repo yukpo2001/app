@@ -1,5 +1,7 @@
 "use server";
 
+import { rankPlacesByTaste } from "./recommendation";
+
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 export async function getPlacesRecommendations(keyword: string) {
@@ -31,8 +33,7 @@ export async function getPlacesRecommendations(keyword: string) {
 
         const data = await response.json();
 
-        // Transform the Google API response into our internal data structure
-        return (data.places || []).map((place: any) => ({
+        const results = (data.places || []).map((place: any) => ({
             id: place.id,
             name: place.displayName?.text || "Unknown Place",
             category: place.types?.[0] || "Location",
@@ -53,6 +54,8 @@ export async function getPlacesRecommendations(keyword: string) {
                 ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthGb=800`
                 : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
         }));
+
+        return rankPlacesByTaste(results);
     } catch (error) {
         console.error("Error fetching places:", error);
         return [];

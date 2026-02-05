@@ -38,9 +38,10 @@ export default function Home() {
     setIsAnalyzing(true);
     const phrases = [
       "실시간 구글 지도 데이터를 불러오고 있어요...",
-      "유저 리뷰들을 꼼꼼히 분석하고 있습니다...",
-      "당신의 취향을 Lumi가 파악하는 중이에요!",
-      "가장 힙하고 평점 좋은 곳을 선정하고 있어요..."
+      "yukpo2001님의 과거 리뷰 스타일을 분석 중입니다...",
+      "유저 리뷰들과 yukpo2001님의 취향을 매칭하고 있어요...",
+      "당신의 취향을 Lumi가 완벽히 파악하는 중이에요!",
+      "가장 힙하고 yukpo2001님이 좋아하실 곳을 선정 중입니다..."
     ];
 
     let phraseIdx = 0;
@@ -252,7 +253,7 @@ export default function Home() {
 
             <div className="mb-16">
               <h1 className="gradient-text mb-4">{t("result.title")}</h1>
-              <p className="text-xl text-gray-500">{t("result.subtitle")}</p>
+              <p className="text-xl text-gray-500">yukpo2001님의 취향을 분석하여 Lumi가 직접 엄선한 추천 리스트입니다. ✨</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
