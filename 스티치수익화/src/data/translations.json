@@ -1,0 +1,70 @@
+{
+    "ko": {
+        "title": "Lumi's Pick",
+        "subtitle": "AI가 제안하는 당신만의 감성 여행 로드맵",
+        "description": "구글 지도 리뷰를 분석하여 당신의 취향에 딱 맞는 맛집과 즐길거리를 추천해드립니다.",
+        "start_btn": "나만의 여행 코스 만들기",
+        "intro_btn": "서비스 소개",
+        "features": {
+            "food": "취향 저격 맛집",
+            "activity": "감성 즐길거리",
+            "itinerary": "맞춤형 일정"
+        },
+        "diagnose": {
+            "title": "구글 지도 리뷰 불러오기",
+            "description": "내 리뷰 데이터를 기반으로 Lumi가 최고의 장소를 찾아드립니다.",
+            "analyzing": "리뷰 분석 중...",
+            "start": "분석 시작하기",
+            "complete_title": "분석 완료!",
+            "complete_desc": "Lumi가 당신의 취향을 완벽하게 파악했어요.",
+            "view_result": "결과 확인하기"
+        },
+        "result": {
+            "back": "다시 시작하기",
+            "title": "Lumi's Recommendation",
+            "subtitle": "당신의 리뷰를 기반으로 엄선한 장소들입니다.",
+            "detail": {
+                "address": "주소",
+                "phone": "전화번호",
+                "hours": "영업시간",
+                "rating": "평점",
+                "view_map": "Google 지도에서 보기",
+                "more_info": "상세 정보 보기"
+            }
+        }
+    },
+    "en": {
+        "title": "Lumi's Pick",
+        "subtitle": "Your AI-Powered Aesthetic Travel Roadmap",
+        "description": "Analyze your Google Maps reviews to find the perfect spots and activities tailored just for you.",
+        "start_btn": "Create My Itinerary",
+        "intro_btn": "Learn More",
+        "features": {
+            "food": "Perfect Eateries",
+            "activity": "Aesthetic Fun",
+            "itinerary": "Custom Schedule"
+        },
+        "diagnose": {
+            "title": "Import Google Maps Reviews",
+            "description": "Let Lumi find the best spots based on your review history.",
+            "analyzing": "Analyzing reviews...",
+            "start": "Start Analysis",
+            "complete_title": "Analysis Complete!",
+            "complete_desc": "Lumi has perfectly captured your taste.",
+            "view_result": "View Results"
+        },
+        "result": {
+            "back": "Start Over",
+            "title": "Lumi's Recommendation",
+            "subtitle": "Carefully selected spots based on your reviews.",
+            "detail": {
+                "address": "Address",
+                "phone": "Phone",
+                "hours": "Hours",
+                "rating": "Rating",
+                "view_map": "Open in Google Maps",
+                "more_info": "View Details"
+            }
+        }
+    }
+}
