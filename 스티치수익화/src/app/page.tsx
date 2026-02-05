@@ -169,7 +169,11 @@ export default function Home() {
                 { icon: Sparkles, title: t("features.activity"), color: "accent" },
                 { icon: MapPin, title: t("features.itinerary"), color: "secondary" }
               ].map((feature, idx) => (
-                <div key={idx} className="glass p-8 rounded-3xl group hover:scale-105 transition-transform cursor-pointer">
+                <div
+                  key={idx}
+                  onClick={handleGoToDiagnose}
+                  className="glass p-8 rounded-3xl group hover:scale-105 transition-transform cursor-pointer"
+                >
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-${feature.color}/10 group-hover:bg-${feature.color}/20 transition-colors`}>
                     <feature.icon className={`w-6 h-6 text-${feature.color}`} />
                   </div>
