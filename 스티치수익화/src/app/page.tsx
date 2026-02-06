@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "@/lib/LanguageContext";
-import { useTravel } from "@/lib/TravelContext";
+import { useTravel, type Place } from "@/lib/TravelContext";
 import { getPlacesRecommendations } from "@/lib/google-maps";
 import { LumiCharacter } from "@/components/LumiCharacter";
 import {
@@ -19,7 +19,7 @@ type View = "landing" | "diagnose" | "result";
 
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
-  const { recommendations, setRecommendations, itinerary, addToItinerary, points } = useTravel();
+  const { itinerary, addToItinerary, points } = useTravel();
   const persona = getTravelPersona();
 
   // App State
@@ -27,7 +27,8 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [analysisText, setAnalysisText] = useState("");
-  const [selectedPlace, setSelectedPlace] = useState<any>(null);
+  const [recommendations, setRecommendations] = useState<Place[]>([]);
+  const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [diagnoseStep, setDiagnoseStep] = useState(1);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -128,7 +129,7 @@ export default function Home() {
     }
   };
 
-  const openDetail = (place: any) => {
+  const openDetail = (place: Place) => {
     setSelectedPlace(place);
     setIsModalOpen(true);
   };
@@ -369,7 +370,7 @@ export default function Home() {
                   <button onClick={handleGoToDiagnose} className="btn-secondary">이전으로 돌아가기</button>
                 </div>
               ) : (
-                recommendations.map((item: any, idx: number) => (
+                recommendations.map((item: Place, idx: number) => (
                   <motion.div
                     key={item.id}
                     initial={{ opacity: 0, y: 30 }}
@@ -439,7 +440,7 @@ export default function Home() {
       </AnimatePresence>
 
       <PlaceDetailModal
-        place={selectedPlace}
+        place={selectedPlace as Place}
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         t={t}

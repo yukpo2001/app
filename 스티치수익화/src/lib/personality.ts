@@ -10,20 +10,17 @@ export interface Persona {
 
 export const getTravelPersona = (): Persona => {
     const reviews = userTastes.reviews;
-    const keywords = userTastes.style_keywords;
 
     // Simple heuristic-based persona detection
     let modernCount = 0;
     let localCount = 0;
     let cozyCount = 0;
-    let qualityCount = 0;
 
     reviews.forEach(r => {
         const text = r.text.toLowerCase();
         if (text.includes("modern") || text.includes("깔끔") || text.includes("정갈")) modernCount++;
         if (text.includes("로컬") || text.includes("전통") || text.includes("숨은")) localCount++;
         if (text.includes("cozy") || text.includes("조용") || text.includes("여유")) cozyCount++;
-        if (r.rating >= 4.5) qualityCount++;
     });
 
     if (localCount >= modernCount && localCount >= cozyCount) {

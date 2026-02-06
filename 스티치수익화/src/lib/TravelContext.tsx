@@ -8,6 +8,7 @@ export interface Place {
     category: string;
     rating: number;
     review: string;
+    reviews: Array<{ author: string; text: string; rating: number }>;
     tags: string[];
     address: string;
     phone: string;
@@ -44,6 +45,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
             try {
                 const data = JSON.parse(decodeURIComponent(hash));
                 if (Array.isArray(data)) {
+                    // eslint-disable-next-line react-hooks/set-state-in-effect
                     setItinerary(data);
                 }
             } catch (e) {

@@ -13,7 +13,20 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
     const url = "https://places.googleapis.com/v1/places:searchText";
 
     try {
-        const body: any = {
+        const body: {
+            textQuery: string;
+            languageCode: string;
+            maxResultCount: number;
+            locationBias?: {
+                circle: {
+                    center: {
+                        latitude: number;
+                        longitude: number;
+                    };
+                    radius: number;
+                };
+            };
+        } = {
             textQuery: keyword,
             languageCode: "ko",
             maxResultCount: 6,
@@ -47,7 +60,23 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 
         const data = await response.json();
 
-        const results = (data.places || []).map((place: any) => ({
+        const results = (data.places || []).map((place: {
+            id: string;
+            displayName?: { text: string };
+            types?: string[];
+            rating?: number;
+            reviews?: Array<{
+                authorAttribution?: { displayName: string };
+                text?: { text: string };
+                rating: number;
+                relativePublishTimeDescription: string;
+            }>;
+            formattedAddress?: string;
+            nationalPhoneNumber?: string;
+            regularOpeningHours?: { weekdayDescriptions: string[] };
+            googleMapsUri: string;
+            photos?: Array<{ name: string }>;
+        }) => ({
             id: place.id,
             name: place.displayName?.text || "Unknown Place",
             category: place.types?.[0] || "Location",

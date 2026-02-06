@@ -1,10 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Phone, Clock, ExternalLink, Star, CheckCircle2, Award } from "lucide-react";
 import { useState } from "react";
-import { useTravel } from "@/lib/TravelContext";
+import { useTravel, type Place } from "@/lib/TravelContext";
 
 interface PlaceDetailModalProps {
-    place: any;
+    place: Place;
     isOpen: boolean;
     onClose: () => void;
     t: (key: string) => string;
@@ -117,7 +117,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                 </div>
                                 <div className="space-y-6 max-h-40 overflow-y-auto pr-4 custom-scrollbar mb-6">
                                     {place.reviews && place.reviews.length > 0 ? (
-                                        place.reviews.map((rev: any, i: number) => (
+                                        place.reviews.map((rev: { author: string; text: string; rating: number }, i: number) => (
                                             <div key={i} className="border-b border-black/5 last:border-0 pb-4 last:pb-0">
                                                 <div className="flex justify-between items-center mb-2">
                                                     <span className="text-sm font-bold text-gray-700">{rev.author}</span>
@@ -127,7 +127,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                                     </div>
                                                 </div>
                                                 <p className="text-sm text-gray-500 leading-relaxed italic">
-                                                    "{rev.text}"
+                                                    &quot;{rev.text}&quot;
                                                 </p>
                                             </div>
                                         ))
@@ -140,15 +140,15 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                 {place.lumiTip && (
                                     <div className="relative mt-8 pt-8 border-t border-black/5 flex items-start gap-6">
                                         <div className="w-20 shrink-0">
-                                            <img src="/lumi_avatar.png" alt="Lumi" className="w-full h-auto drop-shadow-md" onError={(e) => {
+                                            <img src="/lumi_avatar.png" alt="Lumi" className="w-full h-auto drop-shadow-md" onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
                                                 // Fallback if avatar doesn't exist yet
-                                                (e.target as any).style.display = 'none';
+                                                (e.target as HTMLImageElement).style.display = 'none';
                                             }} />
                                         </div>
                                         <div className="flex-1 bg-primary/10 border border-primary/20 p-5 rounded-2xl rounded-tl-none relative animate-in fade-in slide-in-from-left-4 duration-500">
                                             <div className="absolute -left-3 top-0 border-[12px] border-transparent border-t-primary/10 border-r-primary/10" />
                                             <p className="text-xs font-bold text-primary mb-1 uppercase tracking-wider flex items-center gap-1">
-                                                <Star className="w-3 h-3" /> Lumi's Special Tip
+                                                <Star className="w-3 h-3" /> Lumi&apos;s Special Tip
                                             </p>
                                             <p className="text-sm font-medium text-primary/80 leading-relaxed">
                                                 {place.lumiTip}
@@ -185,8 +185,8 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                     onClick={handleCertifyVisit}
                                     disabled={isVisited}
                                     className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isVisited
-                                            ? "bg-gray-100 text-gray-400"
-                                            : "bg-secondary text-white shadow-lg shadow-secondary/20 hover:scale-[1.02]"
+                                        ? "bg-gray-100 text-gray-400"
+                                        : "bg-secondary text-white shadow-lg shadow-secondary/20 hover:scale-[1.02]"
                                         }`}
                                 >
                                     {isVisited ? (

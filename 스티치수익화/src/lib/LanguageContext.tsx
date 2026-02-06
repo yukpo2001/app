@@ -8,7 +8,7 @@ type Language = "ko" | "en";
 interface LanguageContextType {
   language: Language;
   setLanguage: (lang: Language) => void;
-  t: (key: string) => any;
+  t: (key: string) => string;
 }
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
@@ -18,6 +18,7 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
   useEffect(() => {
     const saved = localStorage.getItem("lang") as Language;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (saved) setLanguage(saved);
   }, []);
 
@@ -26,13 +27,13 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
     localStorage.setItem("lang", lang);
   };
 
-  const t = (key: string) => {
+  const t = (key: string): string => {
     const keys = key.split(".");
     let result: any = (translations as any)[language];
     for (const k of keys) {
       result = result?.[k];
     }
-    return result || key;
+    return (result || key) as string;
   };
 
   return (
