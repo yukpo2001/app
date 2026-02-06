@@ -1,4 +1,4 @@
-import userTastes from "@/data/user_tastes.json";
+import userTastes from "../data/user_tastes.json";
 
 export interface Place {
     id: string;

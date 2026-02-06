@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { LanguageProvider } from "@/lib/LanguageContext";
-import { TravelProvider } from "@/lib/TravelContext";
+import { LanguageProvider } from "../lib/LanguageContext";
+import { TravelProvider } from "../lib/TravelContext";
 
 const inter = Inter({
   variable: "--font-sans",

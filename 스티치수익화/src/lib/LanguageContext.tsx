@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import translations from "@/data/translations.json";
+import translations from "../data/translations.json";
 
 type Language = "ko" | "en";
 

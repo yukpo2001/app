@@ -2,18 +2,18 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useLanguage } from "@/lib/LanguageContext";
-import { useTravel, type Place } from "@/lib/TravelContext";
-import { getPlacesRecommendations } from "@/lib/google-maps";
-import { LumiCharacter } from "@/components/LumiCharacter";
+import { useLanguage } from "../lib/LanguageContext";
+import { useTravel, type Place } from "../lib/TravelContext";
+import { getPlacesRecommendations } from "../lib/google-maps";
+import { LumiCharacter } from "../components/LumiCharacter";
 import {
   MapPin, Utensils, Sparkles, Globe,
   Loader2, CheckCircle2, Star, ExternalLink,
   ArrowLeft, Navigation
 } from "lucide-react";
-import { PlaceDetailModal } from "@/components/PlaceDetailModal";
-import { getTravelPersona } from "@/lib/personality";
-import { ItineraryView } from "@/components/ItineraryView";
+import { PlaceDetailModal } from "../components/PlaceDetailModal";
+import { getTravelPersona } from "../lib/personality";
+import { ItineraryView } from "../components/ItineraryView";
 
 type View = "landing" | "diagnose" | "result";
 
