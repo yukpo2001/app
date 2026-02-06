@@ -65,3 +65,26 @@ export const rankPlacesByTaste = (places: Place[]) => {
         return { ...place, tasteScore: Math.round(score * 10) / 10, lumiTip: tip };
     }).sort((a, b) => (b.tasteScore || 0) - (a.tasteScore || 0));
 };
+
+export const optimizeRoute = (itinerary: Place[], weather: string) => {
+    // Weather-based optimization logic
+    // If it rains, prioritize indoor categories (restaurant, cafe)
+    // If it's sunny, prioritize outdoor categories (park, tourist_attraction)
+
+    const isBadWeather = ["Rain", "Snow", "Clouds"].includes(weather);
+
+    return [...itinerary].sort((a, b) => {
+        const indoorCategories = ["restaurant", "cafe", "museum", "shopping_mall"];
+        const aIsIndoor = indoorCategories.includes(a.category);
+        const bIsIndoor = indoorCategories.includes(b.category);
+
+        if (isBadWeather) {
+            if (aIsIndoor && !bIsIndoor) return -1;
+            if (!aIsIndoor && bIsIndoor) return 1;
+        } else {
+            if (!aIsIndoor && bIsIndoor) return -1;
+            if (aIsIndoor && bIsIndoor) return 1;
+        }
+        return 0;
+    });
+};

@@ -9,15 +9,18 @@ import { LumiCharacter } from "@/components/LumiCharacter";
 import {
   MapPin, Utensils, Sparkles, Globe, Search,
   Loader2, CheckCircle2, Star, ExternalLink,
-  ArrowLeft, Clock
+  ArrowLeft, Clock, Navigation
 } from "lucide-react";
 import { PlaceDetailModal } from "@/components/PlaceDetailModal";
+import { getTravelPersona } from "@/lib/personality";
+import { ItineraryView } from "@/components/ItineraryView";
 
 type View = "landing" | "diagnose" | "result";
 
 export default function Home() {
   const { language, setLanguage, t } = useLanguage();
-  const { recommendations, setRecommendations } = useTravel();
+  const { recommendations, setRecommendations, itinerary, addToItinerary, points } = useTravel();
+  const persona = getTravelPersona();
 
   // App State
   const [view, setView] = useState<View>("landing");
@@ -28,15 +31,20 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [diagnoseStep, setDiagnoseStep] = useState(1);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [showItinerary, setShowItinerary] = useState(false);
 
   const toggleLanguage = () => {
     setLanguage(language === "ko" ? "en" : "ko");
   };
 
-  const startAnalysis = async (customLocation?: { lat: number; lng: number }) => {
-    if (!keyword.trim() && !customLocation) return;
+  const startAnalysis = async (customLocation?: { lat: number; lng: number }, overrideKeyword?: string) => {
+    const activeKeyword = overrideKeyword || keyword;
+    if (!activeKeyword.trim() && !customLocation) return;
 
     setIsAnalyzing(true);
+    setView("diagnose");
+    setDiagnoseStep(1);
+
     const phrases = [
       "실시간 구글 지도 데이터를 불러오고 있어요...",
       "yukpo2001님의 과거 리뷰 스타일을 분석 중입니다...",
@@ -52,7 +60,7 @@ export default function Home() {
     }, 1200);
 
     try {
-      const searchKeyword = keyword.trim() || "추천 장소";
+      const searchKeyword = activeKeyword.trim() || "추천 장소";
       const results = await getPlacesRecommendations(searchKeyword, customLocation || location || undefined);
       setRecommendations(results);
       setDiagnoseStep(2);
@@ -67,6 +75,8 @@ export default function Home() {
   const handleNearbySearch = () => {
     if ("geolocation" in navigator) {
       setIsAnalyzing(true);
+      setView("diagnose");
+      setDiagnoseStep(1);
       setAnalysisText("현재 위치를 확인하고 있어요...");
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -85,6 +95,36 @@ export default function Home() {
       );
     } else {
       alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
+    }
+  };
+
+  const handleFeatureAnalysis = (title: string) => {
+    setKeyword(title);
+    if ("geolocation" in navigator) {
+      setIsAnalyzing(true);
+      setView("diagnose");
+      setDiagnoseStep(1);
+      setAnalysisText("현재 위치를 확인하고 있어요...");
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const loc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setLocation(loc);
+          startAnalysis(loc, title);
+        },
+        (error) => {
+          console.error("Geolocation error:", error);
+          // If geolocation fails, just go to search page with keyword set
+          setView("diagnose");
+          setDiagnoseStep(1);
+          setIsAnalyzing(false);
+        }
+      );
+    } else {
+      setView("diagnose");
+      setDiagnoseStep(1);
     }
   };
 
@@ -130,7 +170,7 @@ export default function Home() {
             className="flex-1 flex flex-col items-center justify-center pt-20"
           >
             <div className="max-w-4xl w-full text-center">
-              <LumiCharacter />
+              <LumiCharacter cosplay={persona.cosplay} />
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -165,13 +205,13 @@ export default function Home() {
               className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 max-w-5xl w-full"
             >
               {[
-                { icon: Utensils, title: t("features.food"), color: "primary" },
-                { icon: Sparkles, title: t("features.activity"), color: "accent" },
-                { icon: MapPin, title: t("features.itinerary"), color: "secondary" }
+                { icon: Utensils, title: t("features.food"), color: "primary", type: "search" },
+                { icon: Sparkles, title: t("features.activity"), color: "accent", type: "search" },
+                { icon: MapPin, title: t("features.itinerary"), color: "secondary", type: "diagnose" }
               ].map((feature, idx) => (
                 <div
                   key={idx}
-                  onClick={handleGoToDiagnose}
+                  onClick={() => feature.type === "search" ? handleFeatureAnalysis(feature.title) : handleGoToDiagnose()}
                   className="glass p-8 rounded-3xl group hover:scale-105 transition-transform cursor-pointer"
                 >
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center mb-6 bg-${feature.color}/10 group-hover:bg-${feature.color}/20 transition-colors`}>
@@ -202,7 +242,7 @@ export default function Home() {
                   exit={{ opacity: 0, scale: 1.05 }}
                   className="glass p-12 rounded-[3rem] max-w-2xl w-full text-center"
                 >
-                  <LumiCharacter />
+                  <LumiCharacter cosplay={persona.cosplay} />
                   <h2 className="text-3xl font-bold mb-4">Lumi에게 장소 물어보기</h2>
                   <p className="text-gray-500 mb-8">가고 싶은 지역이나 테마를 입력해 주세요. (예: 성수동 힙한 카페)</p>
 
@@ -293,7 +333,33 @@ export default function Home() {
 
             <div className="mb-16">
               <h1 className="gradient-text mb-4">{t("result.title")}</h1>
-              <p className="text-xl text-gray-500">yukpo2001님의 취향을 분석하여 Lumi가 직접 엄선한 추천 리스트입니다. ✨</p>
+              <p className="text-xl text-gray-500 mb-8">yukpo2001님의 취향을 분석하여 Lumi가 직접 엄선한 추천 리스트입니다. ✨</p>
+
+              {/* AI Persona Section */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                className="glass p-8 rounded-[2rem] border-l-8 border-primary flex flex-col md:flex-row items-center gap-8 mb-12 shadow-xl bg-white/40"
+              >
+                <div className="text-6xl">{persona.icon}</div>
+                <div className="flex-1 text-center md:text-left">
+                  <div className="flex items-center justify-center md:justify-start gap-3 mb-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-primary px-3 py-1 bg-primary/10 rounded-full">Your Persona</span>
+                    <span className="text-xs font-bold text-secondary flex items-center gap-1">
+                      <Star className="w-3 h-3 fill-secondary" />
+                      {points + 100} pts
+                    </span>
+                  </div>
+                  <h2 className="text-2xl font-bold mb-2">{persona.title}</h2>
+                  <p className="text-gray-500 leading-relaxed">{persona.description}</p>
+                </div>
+                <div className="flex flex-col gap-2 w-full md:w-auto">
+                  <div className="text-center px-6 py-3 bg-primary/5 rounded-2xl border border-primary/10">
+                    <p className="text-[10px] text-primary font-bold uppercase mb-1">Bucket List</p>
+                    <p className="text-xl font-black text-primary">{itinerary.length} Places</p>
+                  </div>
+                </div>
+              </motion.div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -331,21 +397,36 @@ export default function Home() {
                       </div>
                       <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors">{item.name}</h3>
 
-                      <div className="space-y-2 mb-6">
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <MapPin className="w-3 h-3 text-primary" />
-                          {item.address.split(" ").slice(0, 2).join(" ")}...
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <Clock className="w-3 h-3 text-secondary" />
-                          {item.hours.split(",")[0]}
-                        </div>
-                      </div>
+                      <div className="flex flex-col gap-3">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            addToItinerary(item);
+                          }}
+                          disabled={itinerary.some(p => p.id === item.id)}
+                          className={`w-full py-3 rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 ${itinerary.some(p => p.id === item.id)
+                            ? "bg-gray-100 text-gray-400 cursor-default"
+                            : "bg-primary/10 text-primary hover:bg-primary hover:text-white"
+                            }`}
+                        >
+                          {itinerary.some(p => p.id === item.id) ? (
+                            <>
+                              <CheckCircle2 className="w-4 h-4" />
+                              장바구니 담김
+                            </>
+                          ) : (
+                            <>
+                              <MapPin className="w-4 h-4" />
+                              일정에 추가하기
+                            </>
+                          )}
+                        </button>
 
-                      <div className="flex items-center justify-between border-t border-gray-100 pt-6">
-                        <span className="text-xs font-bold text-primary group-hover:underline">{t("result.detail.more_info")}</span>
-                        <div className="text-primary p-2 bg-primary/5 hover:bg-primary/10 rounded-full transition-all">
-                          <ExternalLink className="w-4 h-4" />
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <span className="text-xs font-bold text-primary group-hover:underline">{t("result.detail.more_info")}</span>
+                          <div className="text-primary p-2 bg-primary/5 hover:bg-primary/10 rounded-full transition-all">
+                            <ExternalLink className="w-4 h-4" />
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -364,7 +445,42 @@ export default function Home() {
         t={t}
       />
 
-      {/* Footer Branding (Always visible on Landing, optionally hidden elsewhere) */}
+      {/* Itinerary Overlay Portal-like logic */}
+      <AnimatePresence>
+        {showItinerary && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowItinerary(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <div className="relative w-full max-w-5xl">
+              <ItineraryView onClose={() => setShowItinerary(false)} />
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Itinerary Button */}
+      {view === "result" && itinerary.length > 0 && (
+        <motion.button
+          initial={{ scale: 0, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          whileHover={{ scale: 1.05 }}
+          onClick={() => setShowItinerary(true)}
+          className="fixed bottom-10 right-10 z-50 p-6 bg-primary text-white rounded-full shadow-2xl flex items-center gap-3 overflow-hidden"
+        >
+          <div className="absolute top-0 right-0 -mr-1 -mt-1 w-6 h-6 bg-secondary text-[10px] font-black rounded-full flex items-center justify-center border-2 border-white">
+            {itinerary.length}
+          </div>
+          <Navigation className="w-6 h-6" />
+          <span className="font-bold underline">내 일정 최적화해서 보기</span>
+        </motion.button>
+      )}
+
+      {/* Footer Branding */}
       {view === "landing" && (
         <motion.p
           initial={{ opacity: 0 }}

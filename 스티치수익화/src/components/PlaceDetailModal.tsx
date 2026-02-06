@@ -1,7 +1,7 @@
-"use client";
-
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, Phone, Clock, ExternalLink, Star } from "lucide-react";
+import { X, MapPin, Phone, Clock, ExternalLink, Star, CheckCircle2, Award } from "lucide-react";
+import { useState } from "react";
+import { useTravel } from "@/lib/TravelContext";
 
 interface PlaceDetailModalProps {
     place: any;
@@ -11,7 +11,18 @@ interface PlaceDetailModalProps {
 }
 
 export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModalProps) => {
+    const { addPoints } = useTravel();
+    const [isVisited, setIsVisited] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+
     if (!place) return null;
+
+    const handleCertifyVisit = () => {
+        setIsVisited(true);
+        addPoints(50);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+    };
 
     return (
         <AnimatePresence>
@@ -145,6 +156,49 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                         </div>
                                     </div>
                                 )}
+                            </div>
+
+                            {/* Visit Certification Section */}
+                            <div className="mb-8 p-6 bg-secondary/5 rounded-3xl border border-secondary/10 relative overflow-hidden">
+                                {showSuccess && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: 10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        className="absolute inset-0 bg-secondary flex items-center justify-center z-10"
+                                    >
+                                        <div className="text-center text-white">
+                                            <Award className="w-8 h-8 mx-auto mb-2" />
+                                            <p className="font-bold">+50 Lumi Points 적립!</p>
+                                        </div>
+                                    </motion.div>
+                                )}
+
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className="flex items-center gap-2">
+                                        <Award className="w-5 h-5 text-secondary" />
+                                        <p className="text-sm font-bold">방문 인증하고 포인트 받기</p>
+                                    </div>
+                                    <span className="text-[10px] font-black bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">+50 PTS</span>
+                                </div>
+
+                                <button
+                                    onClick={handleCertifyVisit}
+                                    disabled={isVisited}
+                                    className={`w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 transition-all ${isVisited
+                                            ? "bg-gray-100 text-gray-400"
+                                            : "bg-secondary text-white shadow-lg shadow-secondary/20 hover:scale-[1.02]"
+                                        }`}
+                                >
+                                    {isVisited ? (
+                                        <>
+                                            <CheckCircle2 className="w-5 h-5" />
+                                            방문 인증 완료
+                                        </>
+                                    ) : (
+                                        "이 장소 방문했어요!"
+                                    )}
+                                </button>
+                                <p className="text-[10px] text-gray-400 mt-3 text-center">방문 완료 후 Lumi에게 후기를 들려주시면 추가 포인트가 지급됩니다.</p>
                             </div>
 
                             <a

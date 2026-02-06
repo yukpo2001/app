@@ -2,7 +2,11 @@
 
 import { motion } from "framer-motion";
 
-export const LumiCharacter = () => {
+interface LumiProps {
+    cosplay?: "explorer" | "modern" | "healer";
+}
+
+export const LumiCharacter = ({ cosplay }: LumiProps) => {
     return (
         <motion.div
             initial={{ y: 20, opacity: 0 }}
@@ -49,13 +53,50 @@ export const LumiCharacter = () => {
                 <path d="M60 120 L30 115 M60 130 L30 135" stroke="oklch(0.7 0.1 280)" strokeWidth="2" />
                 <path d="M140 120 L170 115 M140 130 L170 135" stroke="oklch(0.7 0.1 280)" strokeWidth="2" />
 
-                {/* Beret */}
-                <ellipse cx="100" cy="55" rx="45" ry="15" fill="oklch(0.7 0.1 280)" />
-                <circle cx="100" cy="40" r="5" fill="oklch(0.7 0.1 280)" />
+                {/* Cosplay Items */}
+                {cosplay === "explorer" && (
+                    <g>
+                        {/* Explorer Hat */}
+                        <path d="M40 70 Q100 30 160 70 L160 85 Q100 100 40 85 Z" fill="oklch(0.5 0.1 50)" />
+                        <rect x="70" y="65" width="60" height="5" fill="oklch(0.4 0.1 50)" />
+                    </g>
+                )}
+
+                {cosplay === "modern" && (
+                    <g>
+                        {/* Designer Sunglasses */}
+                        <rect x="60" y="95" width="25" height="15" rx="5" fill="black" opacity="0.8" />
+                        <rect x="115" y="95" width="25" height="15" rx="5" fill="black" opacity="0.8" />
+                        <path d="M85 102 L115 102" stroke="black" strokeWidth="2" />
+                        {/* Scarf */}
+                        <path d="M60 170 Q100 190 140 170" fill="none" stroke="oklch(0.6 0.2 300)" strokeWidth="10" />
+                    </g>
+                )}
+
+                {cosplay === "healer" && (
+                    <g>
+                        {/* Flower Crown */}
+                        <circle cx="70" cy="50" r="8" fill="pink" />
+                        <circle cx="100" cy="40" r="8" fill="yellow" />
+                        <circle cx="130" cy="50" r="8" fill="lightblue" />
+                        <path d="M60 55 Q100 35 140 55" fill="none" stroke="lightgreen" strokeWidth="2" />
+                    </g>
+                )}
+
+                {!cosplay && (
+                    <g>
+                        {/* Default Beret */}
+                        <ellipse cx="100" cy="55" rx="45" ry="15" fill="oklch(0.7 0.1 280)" />
+                        <circle cx="100" cy="40" r="5" fill="oklch(0.7 0.1 280)" />
+                    </g>
+                )}
             </svg>
 
             {/* Decorative Glow */}
-            <div className="absolute inset-0 bg-primary/20 blur-3xl -z-10 rounded-full scale-150" />
+            <div className={`absolute inset-0 blur-3xl -z-10 rounded-full scale-150 ${cosplay === "explorer" ? "bg-secondary/20" :
+                    cosplay === "modern" ? "bg-primary/20" :
+                        cosplay === "healer" ? "bg-accent/20" : "bg-primary/20"
+                }`} />
         </motion.div>
     );
 };
