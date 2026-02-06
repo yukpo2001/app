@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: oklch(0.7 0.1 280);
+  --color-secondary: oklch(0.85 0.05 160);
+  --color-accent: oklch(0.8 0.15 340);
+  
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", sans-serif;
+}
+
+:root {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.15 0.01 250);
+}
+
+@layer base {
+  body {
+    @apply bg-white text-[oklch(0.15_0.01_250)] font-sans antialiased;
+    background: radial-gradient(circle at top left, oklch(0.97 0.02 280), transparent),
+                radial-gradient(circle at bottom right, oklch(0.97 0.02 160), transparent);
+    min-height: 100vh;
+  }
+}
+
+@layer components {
+  .glass {
+    @apply backdrop-blur-md bg-white/30 border border-white/20 shadow-xl;
+  }
+  
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-[oklch(0.7_0.1_280)] via-[oklch(0.8_0.15_340)] to-[oklch(0.85_0.05_160)] font-serif font-bold text-5xl md:text-7xl;
+  }
+  
+  .btn-primary {
+    @apply px-8 py-4 bg-[oklch(0.15_0.01_250)] text-white font-bold rounded-full transition-all hover:scale-105 hover:shadow-xl active:scale-95;
+  }
+  
+  .btn-secondary {
+    @apply px-8 py-4 bg-white/50 backdrop-blur-lg border border-white/30 text-[oklch(0.15_0.01_250)] font-medium rounded-full transition-all hover:bg-white/80;
+  }
+}
