@@ -29,11 +29,11 @@ export const LanguageProvider = ({ children }: { children: React.ReactNode }) =>
 
   const t = (key: string): string => {
     const keys = key.split(".");
-    let result: any = (translations as any)[language];
+    let result: unknown = (translations as Record<string, unknown>)[language];
     for (const k of keys) {
-      result = result?.[k];
+      result = (result as Record<string, unknown>)?.[k];
     }
-    return (result || key) as string;
+    return (result as string) || key;
   };
 
   return (

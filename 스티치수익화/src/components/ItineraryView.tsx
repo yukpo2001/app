@@ -4,12 +4,10 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { MapPin, Clock, Trash2, Sparkles, Navigation, Loader2 } from "lucide-react";
 import { useTravel, type Place } from "@/lib/TravelContext";
-import { useLanguage } from "@/lib/LanguageContext";
 import { optimizeRoute } from "@/lib/recommendation";
 
 export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
     const { itinerary, removeFromItinerary, setItinerary, shareLink } = useTravel();
-    const { t } = useLanguage();
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [weather, setWeather] = useState("Sunny");
 

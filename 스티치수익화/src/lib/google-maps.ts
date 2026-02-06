@@ -82,7 +82,12 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             category: place.types?.[0] || "Location",
             rating: place.rating || 0,
             review: place.reviews?.[0]?.text?.text || "실시간 리뷰 정보가 없습니다.",
-            reviews: (place.reviews || []).map((r: any) => ({
+            reviews: (place.reviews || []).map((r: {
+                authorAttribution?: { displayName: string };
+                text?: { text: string };
+                rating: number;
+                relativePublishTimeDescription: string;
+            }) => ({
                 author: r.authorAttribution?.displayName,
                 text: r.text?.text,
                 rating: r.rating,

@@ -40,6 +40,7 @@ export function TravelProvider({ children }: { children: ReactNode }) {
 
     // Load from URL on mount
     useEffect(() => {
+        if (typeof window === "undefined") return;
         const hash = window.location.hash.substring(1);
         if (hash) {
             try {

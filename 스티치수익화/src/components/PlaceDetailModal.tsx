@@ -1,6 +1,6 @@
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, MapPin, Phone, Clock, ExternalLink, Star, CheckCircle2, Award } from "lucide-react";
-import { useState } from "react";
 import { useTravel, type Place } from "@/lib/TravelContext";
 
 interface PlaceDetailModalProps {
