@@ -23,7 +23,7 @@ try {
             };
         })
         .filter(review => review.rating >= 4 || (review.text && review.text.trim().length > 0))
-        .slice(0, 100); // Take top 100 relevant reviews
+        .filter(review => review.rating >= 4 || (review.text && review.text.trim().length > 0));
 
     const finalData = {
         user: 'yukpo2001',

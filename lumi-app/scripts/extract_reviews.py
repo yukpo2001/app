@@ -26,8 +26,8 @@ for feature in data.get('features', []):
         })
 
 # Sort by date (if possible) or just take a good sample.
-# For now, let's just take the first 100 for taste analysis
-sample_reviews = extracted_reviews[:100]
+# For now, let's just take all for taste analysis
+sample_reviews = extracted_reviews
 
 final_data = {
     'user': 'yukpo2001',
