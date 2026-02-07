@@ -11,36 +11,22 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
     }
 
     const url = "https://places.googleapis.com/v1/places:searchText";
-    console.log(`Searching for: "${keyword}" at`, location || "global");
 
-    try {
-        const body: {
-            textQuery: string;
-            languageCode: string;
-            maxResultCount: number;
-            locationBias?: {
-                circle: {
-                    center: {
-                        latitude: number;
-                        longitude: number;
-                    };
-                    radius: number;
-                };
-            };
-        } = {
-            textQuery: keyword,
+    // Helper function for the core search request
+    async function performSearch(query: string, loc?: { lat: number; lng: number }) {
+        console.log(`[API Call] Query: "${query}", Location:`, loc || "Global");
+
+        const searchBody: any = {
+            textQuery: query,
             languageCode: "ko",
             maxResultCount: 6,
         };
 
-        if (location) {
-            body.locationBias = {
+        if (loc) {
+            searchBody.locationBias = {
                 circle: {
-                    center: {
-                        latitude: location.lat,
-                        longitude: location.lng
-                    },
-                    radius: 10000.0 // 10km search radius for better mobile coverage
+                    center: { latitude: loc.lat, longitude: loc.lng },
+                    radius: 10000.0 // 10km radius
                 }
             };
         }
@@ -52,82 +38,77 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
                 "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
                 "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews"
             },
-            body: JSON.stringify(body),
+            body: JSON.stringify(searchBody),
         });
 
         if (!response.ok) {
-            throw new Error(`Google Places API error: ${response.statusText}`);
+            const errText = await response.text();
+            console.error(`Google API Error (${response.status}):`, errText);
+            return null;
         }
 
-        const data = await response.json();
-        let places = data.places || [];
+        return await response.json();
+    }
 
-        // Fallback: If no results, try a more general search without "hip" keywords
-        if (places.length === 0 && keyword.includes("힙한")) {
-            console.log("No results found for hip keywords, trying general fallback...");
-            const fallbackKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
-            const fallbackBody = { ...body, textQuery: fallbackKeyword };
-            const fallbackResponse = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
-                    "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews"
-                },
-                body: JSON.stringify(fallbackBody),
-            });
-            if (fallbackResponse.ok) {
-                const fallbackData = await fallbackResponse.json();
-                places = fallbackData.places || [];
-            }
-        }
+    // --- Step By Step Fallback Strategy ---
 
-        const results = places.map((place: {
-            id: string;
-            displayName?: { text: string };
-            types?: string[];
-            rating?: number;
-            reviews?: Array<{
-                authorAttribution?: { displayName: string };
-                text?: { text: string };
-                rating: number;
-                relativePublishTimeDescription: string;
-            }>;
-            formattedAddress?: string;
-            nationalPhoneNumber?: string;
-            regularOpeningHours?: { weekdayDescriptions: string[] };
-            googleMapsUri: string;
-            photos?: Array<{ name: string }>;
-        }) => ({
-            id: place.id,
-            name: place.displayName?.text || "Unknown Place",
-            category: place.types?.[0] || "Location",
-            rating: place.rating || 0,
-            review: place.reviews?.[0]?.text?.text || "실시간 리뷰 정보가 없습니다.",
-            reviews: (place.reviews || []).map((r: {
-                authorAttribution?: { displayName: string };
-                text?: { text: string };
-                rating: number;
-                relativePublishTimeDescription: string;
-            }) => ({
-                author: r.authorAttribution?.displayName,
-                text: r.text?.text,
-                rating: r.rating,
-                publishTime: r.relativePublishTimeDescription
-            })),
-            tags: (place.types || []).slice(0, 3).map((t: string) => t.replace(/_/g, " ")),
-            address: place.formattedAddress || "주소 정보 없음",
-            phone: place.nationalPhoneNumber || "전화번호 정보 없음",
-            hours: place.regularOpeningHours?.weekdayDescriptions?.[0] || "영업시간 정보 없음",
-            mapUrl: place.googleMapsUri,
-            imageUrl: place.photos?.[0]
-                ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthPx=800`
-                : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
-        }));
+    // 1. Initial Search (Keyword + Local)
+    let data = await performSearch(keyword, location);
+    let places = data?.places || [];
 
-        return rankPlacesByTaste(results);
-    } catch (error) {
-        console.error("Error fetching places:", error);
+    // 2. Fallback: Keyword alone (Global Search)
+    if (places.length === 0 && location) {
+        console.log("No local results for keyword. Retrying globally...");
+        data = await performSearch(keyword, undefined);
+        if (data?.places) places = data.places;
+    }
+
+    // 3. Fallback: General category + Local
+    if (places.length === 0) {
+        console.log("Still no results. Retrying with general category locally...");
+        const generalKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
+        data = await performSearch(generalKeyword, location);
+        if (data?.places) places = data.places;
+    }
+
+    // 4. Final Fallback: General category alone
+    if (places.length === 0) {
+        console.log("Absolute zero. Retrying with general category globally...");
+        const generalKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
+        data = await performSearch(generalKeyword, undefined);
+        if (data?.places) places = data.places;
+    }
+
+    if (places.length === 0) {
+        console.warn("All fallback stages failed. No results found.");
         return [];
     }
+
+    const results = places.map((place: any) => ({
+        id: place.id,
+        name: place.displayName?.text || "Unknown Place",
+        category: place.types?.[0] || "Location",
+        rating: place.rating || 0,
+        review: place.reviews?.[0]?.text?.text || "실시간 리뷰 정보가 없습니다.",
+        reviews: (place.reviews || []).map((r: any) => ({
+            author: r.authorAttribution?.displayName,
+            text: r.text?.text,
+            rating: r.rating,
+            publishTime: r.relativePublishTimeDescription
+        })),
+        tags: (place.types || []).slice(0, 3).map((t: string) => t.replace(/_/g, " ")),
+        address: place.formattedAddress || "주소 정보 없음",
+        phone: place.nationalPhoneNumber || "전화번호 정보 없음",
+        hours: place.regularOpeningHours?.weekdayDescriptions?.[0] || "영업시간 정보 없음",
+        mapUrl: place.googleMapsUri,
+        imageUrl: place.photos?.[0]
+            ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthPx=800`
+            : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
+    }));
+
+    return rankPlacesByTaste(results);
+} catch (error) {
+    console.error("Critical error in getPlacesRecommendations:", error);
+    return [];
+}
 }

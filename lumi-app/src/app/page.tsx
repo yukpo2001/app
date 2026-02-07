@@ -368,8 +368,22 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {recommendations.length === 0 ? (
                 <div className="col-span-full py-20 text-center glass rounded-[2.5rem]">
-                  <p className="text-gray-500 mb-6">추천 결과가 없습니다. 다시 시도해 주세요.</p>
-                  <button onClick={handleGoToDiagnose} className="btn-secondary">이전으로 돌아가기</button>
+                  <div className="mb-6 flex justify-center">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
+                      <Search className="w-8 h-8 text-gray-400" />
+                    </div>
+                  </div>
+                  <h3 className="text-2xl font-bold mb-4">근처에서 힙한 곳을 찾지 못했어요</h3>
+                  <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                    현재 계신 곳 주변에는 아직 분석된 힙한 장소가 적을 수 있습니다.<br />
+                    범위를 넓혀서 다시 찾아볼까요?
+                  </p>
+                  <button
+                    onClick={() => startAnalysis(undefined)}
+                    className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
+                  >
+                    전국 힙한 곳에서 찾아보기
+                  </button>
                 </div>
               ) : (
                 recommendations.map((item: Place, idx: number) => (
