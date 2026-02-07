@@ -15,6 +15,7 @@ export interface Place {
     hours: string;
     mapUrl: string;
     imageUrl: string;
+    location?: { lat: number; lng: number };
     tasteScore?: number;
     lumiTip?: string;
 }

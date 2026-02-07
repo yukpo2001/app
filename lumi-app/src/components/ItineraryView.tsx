@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { MapPin, Clock, Trash2, Sparkles, Navigation, Loader2 } from "lucide-react";
+import { MapPin, Clock, Trash2, Sparkles, Navigation, Loader2, Map as MapIcon } from "lucide-react";
 import { useTravel, type Place } from "../lib/TravelContext";
 import { optimizeRoute } from "../lib/recommendation";
+import { MapView } from "./MapView";
 
 export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
     const { itinerary, removeFromItinerary, setItinerary, shareLink } = useTravel();
@@ -68,6 +69,8 @@ export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
                     <button onClick={onClose} className="btn-secondary px-6">돌아가기</button>
                 </div>
             </div>
+
+            <MapView places={displayItinerary} />
 
             {itinerary.length === 0 ? (
                 <div className="py-20 text-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-200">
