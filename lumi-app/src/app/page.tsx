@@ -72,7 +72,7 @@ export default function Home() {
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
               enableHighAccuracy: true,
-              timeout: 5000,
+              timeout: 10000, // Increased to 10s
               maximumAge: 0
             });
           });
@@ -81,8 +81,17 @@ export default function Home() {
             lng: position.coords.longitude
           };
           setLocation(currentLoc);
-        } catch (error) {
-          console.error("Geolocation failed, proceeding without location:", error);
+        } catch (error: any) {
+          console.error("Geolocation failed:", error);
+          let errorMsg = "위치 정보를 가져올 수 없어 일반 검색으로 진행합니다.";
+          if (error.code === 1) {
+            errorMsg = "위치 권한이 거부되었습니다. 일반 검색으로 진행합니다.";
+          } else if (error.code === 3) {
+            errorMsg = "위치 확인 시간이 초과되었습니다. 일반 검색으로 진행합니다.";
+          }
+          setAnalysisText(errorMsg);
+          // Small delay to let user read the error message
+          await new Promise(resolve => setTimeout(resolve, 2000));
         }
       }
 
