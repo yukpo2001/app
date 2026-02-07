@@ -33,15 +33,16 @@ export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [diagnoseStep, setDiagnoseStep] = useState(1);
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [showItinerary, setShowItinerary] = useState(false);
 
   const toggleLanguage = () => {
     setLanguage(language === "ko" ? "en" : "ko");
   };
 
-  const startAnalysis = async (customLocation?: { lat: number; lng: number }, overrideKeyword?: string) => {
+  const startAnalysis = async (overrideKeyword?: string) => {
     const activeKeyword = overrideKeyword || keyword;
-    if (!activeKeyword.trim() && !customLocation) return;
+    if (!activeKeyword.trim()) return;
 
     setIsAnalyzing(true);
     setView("diagnose");
@@ -62,8 +63,31 @@ export default function Home() {
     }, 1200);
 
     try {
-      const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집"; // Better default fallback
-      const results = await getPlacesRecommendations(searchKeyword, customLocation || location || undefined);
+      let currentLoc = location;
+
+      // Only check location if user has explicitly opted in
+      if (useCurrentLocation && !currentLoc) {
+        setAnalysisText("현재 위치를 확인하고 있어요...");
+        try {
+          const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            });
+          });
+          currentLoc = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
+          setLocation(currentLoc);
+        } catch (error) {
+          console.error("Geolocation failed, proceeding without location:", error);
+        }
+      }
+
+      const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집";
+      const results = await getPlacesRecommendations(searchKeyword, currentLoc || undefined);
       setRecommendations(results);
       setDiagnoseStep(2);
     } catch (error) {
@@ -74,32 +98,7 @@ export default function Home() {
     }
   };
 
-  const handleNearbySearch = () => {
-    if ("geolocation" in navigator) {
-      setIsAnalyzing(true);
-      setView("diagnose");
-      setDiagnoseStep(1);
-      setAnalysisText("현재 위치를 확인하고 있어요...");
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const loc = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setLocation(loc);
-          startAnalysis(loc, "내 주변 힙한 핫플 맛집");
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          // Fallback: search without coordinates but with a generic hip keyword
-          startAnalysis(undefined, "서울 힙한 핫플 맛집");
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    } else {
-      alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
-    }
-  };
+  // handleNearbySearch removed as it's now integrated into startAnalysis
 
   const handleFeatureAnalysis = (title: string) => {
     setKeyword(title);
@@ -263,6 +262,22 @@ export default function Home() {
                     />
                   </div>
 
+                  {!isAnalyzing && (
+                    <div className="flex items-center justify-center gap-2 mb-8 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                      <input
+                        type="checkbox"
+                        id="useLocation"
+                        checked={useCurrentLocation}
+                        onChange={(e) => setUseCurrentLocation(e.target.checked)}
+                        className="w-5 h-5 accent-primary cursor-pointer"
+                      />
+                      <label htmlFor="useLocation" className="text-sm font-bold text-primary cursor-pointer flex items-center gap-2">
+                        <MapPin className="w-4 h-4" />
+                        현재 내 주변 장소 우선 추천
+                      </label>
+                    </div>
+                  )}
+
                   <button
                     onClick={() => startAnalysis()}
                     disabled={isAnalyzing || !keyword.trim()}
@@ -280,16 +295,6 @@ export default function Home() {
                       </>
                     )}
                   </button>
-
-                  {!isAnalyzing && (
-                    <button
-                      onClick={handleNearbySearch}
-                      className="mt-4 w-full flex items-center justify-center gap-2 py-4 text-secondary font-bold bg-secondary/10 hover:bg-secondary/20 rounded-[1.5rem] transition-all border border-secondary/20"
-                    >
-                      <MapPin className="w-5 h-5" />
-                      <span>내 주변 힙한 곳 바로 찾기</span>
-                    </button>
-                  )}
                   <button
                     onClick={handleGoToLanding}
                     className="mt-6 text-gray-400 hover:text-gray-600 transition-colors"
@@ -382,10 +387,10 @@ export default function Home() {
                     범위를 넓혀서 다시 찾아볼까요?
                   </p>
                   <button
-                    onClick={() => startAnalysis(undefined)}
+                    onClick={() => startAnalysis(keyword)}
                     className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
                   >
-                    전국 힙한 곳에서 찾아보기
+                    다시 찾아보기
                   </button>
                 </div>
               ) : (
