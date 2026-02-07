@@ -15,8 +15,11 @@
 }
 
 @layer base {
+  html {
+    @apply overflow-x-hidden;
+  }
   body {
-    @apply bg-white text-[oklch(0.15_0.01_250)] font-sans antialiased;
+    @apply bg-white text-[oklch(0.15_0.01_250)] font-sans antialiased overflow-x-hidden;
     background: radial-gradient(circle at top left, oklch(0.97 0.02 280), transparent),
                 radial-gradient(circle at bottom right, oklch(0.97 0.02 160), transparent);
     min-height: 100vh;

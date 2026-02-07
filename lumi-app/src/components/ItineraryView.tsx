@@ -33,7 +33,7 @@ export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
         <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="glass p-8 rounded-[3rem] w-full max-w-4xl mx-auto"
+            className="glass p-6 md:p-8 rounded-[3rem] w-full"
         >
             <div className="flex justify-between items-center mb-10">
                 <div>

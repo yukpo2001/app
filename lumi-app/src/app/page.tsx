@@ -10,7 +10,7 @@ import { LumiCharacter } from "../components/LumiCharacter";
 import {
   MapPin, Utensils, Sparkles, Globe,
   Loader2, CheckCircle2, Star, ExternalLink,
-  ArrowLeft, Navigation
+  ArrowLeft, Navigation, Search, Info
 } from "lucide-react";
 import { PlaceDetailModal } from "../components/PlaceDetailModal";
 import { getTravelPersona } from "../lib/personality";
@@ -103,32 +103,8 @@ export default function Home() {
 
   const handleFeatureAnalysis = (title: string) => {
     setKeyword(title);
-    if ("geolocation" in navigator) {
-      setIsAnalyzing(true);
-      setView("diagnose");
-      setDiagnoseStep(1);
-      setAnalysisText("현재 위치를 확인하고 있어요...");
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const loc = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
-          setLocation(loc);
-          // Combine feature title with "힙한 곳" for better API results
-          startAnalysis(loc, `${title} 힙한 곳`);
-        },
-        (error) => {
-          console.error("Geolocation error:", error);
-          // If geolocation fails, search globally with the keyword
-          startAnalysis(undefined, `${title} 힙한 곳`);
-        },
-        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
-      );
-    } else {
-      setView("diagnose");
-      setDiagnoseStep(1);
-    }
+    setView("diagnose");
+    setDiagnoseStep(1);
   };
 
   const openDetail = (place: Place) => {
@@ -150,7 +126,7 @@ export default function Home() {
   };
 
   return (
-    <main className="relative min-h-screen flex flex-col p-4 overflow-x-hidden">
+    <main className="relative min-h-[100dvh] flex flex-col p-4 overflow-x-hidden">
       {/* Language Toggle */}
       <motion.button
         initial={{ opacity: 0 }}
@@ -170,7 +146,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="flex-1 flex flex-col items-center justify-center pt-20"
+            className="flex-1 flex flex-col items-center justify-center pt-24 pb-12"
           >
             <div className="max-w-4xl w-full text-center">
               <LumiCharacter cosplay={persona.cosplay} />
@@ -199,6 +175,33 @@ export default function Home() {
                 </div>
               </motion.div>
             </div>
+
+            {/* How to Use Section */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="mt-32 p-12 glass rounded-[3rem] text-center"
+            >
+              <h2 className="text-3xl font-bold mb-12">Lumi 이용 방법</h2>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold mb-4 text-xl">1</div>
+                  <h4 className="font-bold mb-2">원하는 테마 선택</h4>
+                  <p className="text-sm text-gray-500">맛집, 카페, 명소 등 원하는 여행 테마를 선택하세요.</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold mb-4 text-xl">2</div>
+                  <h4 className="font-bold mb-2">Lumi의 AI 분석</h4>
+                  <p className="text-sm text-gray-500">방대한 데이터를 바탕으로 사용자님의 취향을 정교하게 분석합니다.</p>
+                </div>
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold mb-4 text-xl">3</div>
+                  <h4 className="font-bold mb-2">취향 저격 명소 탐방</h4>
+                  <p className="text-sm text-gray-500">Lumi가 엄선한 힙한 장소들을 확인하고 나만의 코스를 완성하세요.</p>
+                </div>
+              </div>
+            </motion.div>
 
             {/* Features Grid */}
             <motion.div
@@ -234,7 +237,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 1.05 }}
-            className="flex-1 flex flex-col items-center justify-center"
+            className="flex-1 flex flex-col items-center justify-center py-12"
           >
             <AnimatePresence mode="wait">
               {diagnoseStep === 1 ? (
@@ -473,7 +476,7 @@ export default function Home() {
               onClick={() => setShowItinerary(false)}
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
-            <div className="relative w-full max-w-5xl">
+            <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto custom-scrollbar rounded-[3rem]">
               <ItineraryView onClose={() => setShowItinerary(false)} />
             </div>
           </div>

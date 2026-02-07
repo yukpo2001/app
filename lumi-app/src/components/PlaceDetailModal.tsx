@@ -39,7 +39,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                         initial={{ scale: 0.9, opacity: 0, y: 20 }}
                         animate={{ scale: 1, opacity: 1, y: 0 }}
                         exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                        className="relative glass w-full max-w-2xl bg-white rounded-[2rem] overflow-hidden shadow-2xl"
+                        className="relative glass w-full max-w-2xl bg-white rounded-[2rem] overflow-y-auto max-h-[90vh] shadow-2xl shadow-black/20 custom-scrollbar"
                     >
                         <button
                             onClick={onClose}
@@ -48,7 +48,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                             <X className="w-5 h-5 text-gray-500" />
                         </button>
 
-                        <div className="h-64 relative overflow-hidden">
+                        <div className="h-48 md:h-72 relative overflow-hidden">
                             <img src={place.imageUrl} alt={place.name} className="w-full h-full object-cover" />
                             <div className="absolute inset-0 bg-gradient-to-t from-white via-transparent to-transparent" />
                             <div className="absolute bottom-6 left-8">
@@ -63,7 +63,7 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                             </div>
                         </div>
 
-                        <div className="p-8 md:p-12">
+                        <div className="p-6 md:p-12">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
                                 <div className="space-y-6">
                                     <div className="flex items-start gap-4">
