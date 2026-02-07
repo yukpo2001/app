@@ -40,7 +40,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
                         latitude: location.lat,
                         longitude: location.lng
                     },
-                    radius: 5000.0 // 5km search radius
+                    radius: 10000.0 // 10km search radius for better mobile coverage
                 }
             };
         }
@@ -60,8 +60,29 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
         }
 
         const data = await response.json();
+        let places = data.places || [];
 
-        const results = (data.places || []).map((place: {
+        // Fallback: If no results, try a more general search without "hip" keywords
+        if (places.length === 0 && keyword.includes("힙한")) {
+            console.log("No results found for hip keywords, trying general fallback...");
+            const fallbackKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
+            const fallbackBody = { ...body, textQuery: fallbackKeyword };
+            const fallbackResponse = await fetch(url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY,
+                    "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews"
+                },
+                body: JSON.stringify(fallbackBody),
+            });
+            if (fallbackResponse.ok) {
+                const fallbackData = await fallbackResponse.json();
+                places = fallbackData.places || [];
+            }
+        }
+
+        const results = places.map((place: {
             id: string;
             displayName?: { text: string };
             types?: string[];
@@ -100,7 +121,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             hours: place.regularOpeningHours?.weekdayDescriptions?.[0] || "영업시간 정보 없음",
             mapUrl: place.googleMapsUri,
             imageUrl: place.photos?.[0]
-                ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthGb=800`
+                ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthPx=800`
                 : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800"
         }));
 

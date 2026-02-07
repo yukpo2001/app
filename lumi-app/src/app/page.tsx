@@ -87,13 +87,14 @@ export default function Home() {
             lng: position.coords.longitude
           };
           setLocation(loc);
-          startAnalysis(loc, "내 주변 힙한 핫플 맛집"); // Specifically look for "hip hot places" nearby
+          startAnalysis(loc, "내 주변 힙한 핫플 맛집");
         },
         (error) => {
           console.error("Geolocation error:", error);
-          alert("위치 정보를 가져올 수 없습니다. 기본 검색으로 진행해 주세요.");
-          setIsAnalyzing(false);
-        }
+          // Fallback: search without coordinates but with a generic hip keyword
+          startAnalysis(undefined, "서울 힙한 핫플 맛집");
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       alert("이 브라우저는 위치 정보를 지원하지 않습니다.");
@@ -119,11 +120,10 @@ export default function Home() {
         },
         (error) => {
           console.error("Geolocation error:", error);
-          // If geolocation fails, just go to search page with keyword set
-          setView("diagnose");
-          setDiagnoseStep(1);
-          setIsAnalyzing(false);
-        }
+          // If geolocation fails, search globally with the keyword
+          startAnalysis(undefined, `${title} 힙한 곳`);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
       );
     } else {
       setView("diagnose");
