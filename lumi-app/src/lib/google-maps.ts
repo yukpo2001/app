@@ -11,6 +11,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
     }
 
     const url = "https://places.googleapis.com/v1/places:searchText";
+    console.log(`Searching for: "${keyword}" at`, location || "global");
 
     try {
         const body: {

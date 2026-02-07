@@ -62,7 +62,7 @@ export default function Home() {
     }, 1200);
 
     try {
-      const searchKeyword = activeKeyword.trim() || "추천 장소";
+      const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집"; // Better default fallback
       const results = await getPlacesRecommendations(searchKeyword, customLocation || location || undefined);
       setRecommendations(results);
       setDiagnoseStep(2);
@@ -87,7 +87,7 @@ export default function Home() {
             lng: position.coords.longitude
           };
           setLocation(loc);
-          startAnalysis(loc);
+          startAnalysis(loc, "내 주변 힙한 핫플 맛집"); // Specifically look for "hip hot places" nearby
         },
         (error) => {
           console.error("Geolocation error:", error);
@@ -114,7 +114,8 @@ export default function Home() {
             lng: position.coords.longitude
           };
           setLocation(loc);
-          startAnalysis(loc, title);
+          // Combine feature title with "힙한 곳" for better API results
+          startAnalysis(loc, `${title} 힙한 곳`);
         },
         (error) => {
           console.error("Geolocation error:", error);
