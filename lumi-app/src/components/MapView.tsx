@@ -18,16 +18,23 @@ export const MapView = ({ places }: MapViewProps) => {
         );
     }
 
+    // Helper to get location string (prioritizes lat,lng coordinates over address)
+    const getLocString = (p: Place) => {
+        if (p.location && p.location.lat && p.location.lng) {
+            return `${p.location.lat},${p.location.lng}`;
+        }
+        return p.address;
+    };
+
     // Google Maps Embed API - Directions Mode
-    // origin: first place, destination: last place, waypoints: intermediate places
-    const origin = encodeURIComponent(places[0].address);
-    const destination = encodeURIComponent(places[places.length - 1].address);
+    const origin = encodeURIComponent(getLocString(places[0]));
+    const destination = encodeURIComponent(getLocString(places[places.length - 1]));
 
     let waypoints = "";
     if (places.length > 2) {
         waypoints = places
             .slice(1, -1)
-            .map(p => encodeURIComponent(p.address))
+            .map(p => encodeURIComponent(getLocString(p)))
             .join("|");
     }
 
