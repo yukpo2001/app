@@ -20,7 +20,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             const searchBody: any = {
                 textQuery: query,
                 languageCode: "ko",
-                maxResultCount: 6,
+                maxResultCount: 15,
             };
 
             if (loc) {
@@ -113,4 +113,25 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
         console.error("Critical error in getPlacesRecommendations:", error);
         return [];
     }
+}
+
+export async function getFollowUpRecommendation(currentPlace: any) {
+    if (!GOOGLE_MAPS_API_KEY || !currentPlace.location) return null;
+
+    // Define complementary categories
+    const categories: Record<string, string> = {
+        'restaurant': 'cafe',
+        'food': 'cafe',
+        'cafe': 'park',
+        'park': 'bar',
+        'tourist_attraction': 'cafe',
+        'point_of_interest': 'cafe'
+    };
+
+    const targetCategory = categories[currentPlace.category] || 'cafe';
+    const query = `${targetCategory} 힙한 곳`;
+
+    const results = await getPlacesRecommendations(query, currentPlace.location);
+    // Return the top-ranked complementary place (excluding the current one)
+    return results.find(p => p.id !== currentPlace.id) || null;
 }

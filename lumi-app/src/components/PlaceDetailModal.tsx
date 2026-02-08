@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, MapPin, Phone, Clock, ExternalLink, Star, CheckCircle2, Award } from "lucide-react";
+import { X, MapPin, Phone, Clock, ExternalLink, Star, CheckCircle2, Award, Sparkles, Loader2 } from "lucide-react";
 import { useTravel, type Place } from "../lib/TravelContext";
+import { getFollowUpRecommendation } from "../lib/google-maps";
 
 interface PlaceDetailModalProps {
     place: Place;
@@ -11,9 +12,31 @@ interface PlaceDetailModalProps {
 }
 
 export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModalProps) => {
-    const { addPoints } = useTravel();
+    const { addPoints, addToItinerary, itinerary } = useTravel();
     const [isVisited, setIsVisited] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
+    const [followUp, setFollowUp] = useState<Place | null>(null);
+    const [isLoadingFollowUp, setIsLoadingFollowUp] = useState(false);
+
+    useEffect(() => {
+        if (isOpen && place) {
+            fetchFollowUp();
+        } else {
+            setFollowUp(null);
+        }
+    }, [isOpen, place]);
+
+    const fetchFollowUp = async () => {
+        setIsLoadingFollowUp(true);
+        try {
+            const nextPlace = await getFollowUpRecommendation(place);
+            setFollowUp(nextPlace);
+        } catch (error) {
+            console.error("Failed to fetch follow-up:", error);
+        } finally {
+            setIsLoadingFollowUp(false);
+        }
+    };
 
     if (!place) return null;
 
@@ -141,7 +164,6 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                     <div className="relative mt-8 pt-8 border-t border-black/5 flex items-start gap-6">
                                         <div className="w-20 shrink-0">
                                             <img src="/lumi_avatar.png" alt="Lumi" className="w-full h-auto drop-shadow-md" onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-                                                // Fallback if avatar doesn't exist yet
                                                 (e.target as HTMLImageElement).style.display = 'none';
                                             }} />
                                         </div>
@@ -154,6 +176,56 @@ export const PlaceDetailModal = ({ place, isOpen, onClose, t }: PlaceDetailModal
                                                 {place.lumiTip}
                                             </p>
                                         </div>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Lumi's Next Course Recommendation (match_course) */}
+                            <div className="mb-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <Sparkles className="w-5 h-5 text-secondary" />
+                                    <h3 className="text-lg font-bold">Lumi의 다음 코스 추천</h3>
+                                </div>
+
+                                {isLoadingFollowUp ? (
+                                    <div className="p-8 glass rounded-3xl border border-secondary/10 flex flex-col items-center justify-center gap-3">
+                                        <Loader2 className="w-6 h-6 animate-spin text-secondary" />
+                                        <p className="text-sm text-gray-400">데이터가 연주되는 중...</p>
+                                    </div>
+                                ) : followUp ? (
+                                    <div className="glass rounded-3xl border border-secondary/20 overflow-hidden group">
+                                        <div className="flex flex-col md:flex-row h-full">
+                                            <div className="w-full md:w-40 h-32 md:h-auto shrink-0 relative">
+                                                <img src={followUp.imageUrl} alt={followUp.name} className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                                                <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent" />
+                                            </div>
+                                            <div className="p-6 flex-1 bg-white/40 backdrop-blur">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <h4 className="font-bold text-gray-800">{followUp.name}</h4>
+                                                    <div className="flex items-center gap-1">
+                                                        <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                                                        <span className="text-xs font-bold">{followUp.rating}</span>
+                                                    </div>
+                                                </div>
+                                                <p className="text-sm text-secondary/80 font-medium mb-4 italic">
+                                                    &quot;{followUp.lumiTip?.replace(/yukpo2001님이 좋아하실 만한 분위기에요!/g, "여기가 다음 장소로 딱이야.")}&quot;
+                                                </p>
+                                                <button
+                                                    onClick={() => addToItinerary(followUp)}
+                                                    disabled={itinerary.some(p => p.id === followUp.id)}
+                                                    className={`w-full py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${itinerary.some(p => p.id === followUp.id)
+                                                        ? "bg-gray-100 text-gray-400"
+                                                        : "bg-secondary/10 text-secondary hover:bg-secondary hover:text-white"
+                                                        }`}
+                                                >
+                                                    {itinerary.some(p => p.id === followUp.id) ? "일정에 추가됨" : "이 장소도 일정에 추가"}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ) : (
+                                    <div className="p-8 glass rounded-3xl border border-dashed border-gray-200 text-center">
+                                        <p className="text-sm text-gray-400">근처에 추천할 만한 힙한 장소가 없네. 여기만 제대로 즐겨봐!</p>
                                     </div>
                                 )}
                             </div>
