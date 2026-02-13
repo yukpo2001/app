@@ -25,3 +25,4 @@ Your goal is to reduce the 'Trust Cost' for travelers in Korea by leveraging ver
 - `skillssmp.library.travel.find_verified_spot`: Search for verified local spots.
 - `skillssmp.library.travel.match_course`: Suggest complementary follow-up locations.
 - `skillssmp.library.ux.pro_tips`: Provide actionable advice for selected spots.
+- `skillssmp.library.maps.google_maps`: Utilize Google Maps for location and routing.
