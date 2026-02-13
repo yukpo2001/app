@@ -24,9 +24,10 @@ export const MapView = ({ places }: MapViewProps) => {
             });
 
             try {
-                const { Map, InfoWindow } = await importLibrary("maps") as google.maps.MapsLibrary;
+                // Pre-import necessary libraries
+                const { Map, InfoWindow, Polyline } = await importLibrary("maps") as google.maps.MapsLibrary;
                 const { Marker } = await importLibrary("marker") as google.maps.MarkerLibrary;
-                const { Polyline } = await importLibrary("maps") as google.maps.MapsLibrary;
+                const { LatLngBounds } = await importLibrary("core") as google.maps.CoreLibrary;
 
                 if (!mapRef.current) return;
 
@@ -37,14 +38,14 @@ export const MapView = ({ places }: MapViewProps) => {
                 const newMap = new Map(mapRef.current, {
                     center: center,
                     zoom: 14,
-                    mapId: "LUMI_MAP_ID",
+                    // REMOVED mapId: "LUMI_MAP_ID" as it might cause load failure if invalid
                     disableDefaultUI: true,
                     zoomControl: true,
                 });
 
                 setMap(newMap);
 
-                const bounds = new google.maps.LatLngBounds();
+                const bounds = new LatLngBounds();
                 const pathCoords: google.maps.LatLngLiteral[] = [];
 
                 places.forEach((place, index) => {
@@ -66,7 +67,7 @@ export const MapView = ({ places }: MapViewProps) => {
                             },
                             title: place.name,
                             icon: {
-                                path: google.maps.SymbolPath.CIRCLE,
+                                path: google.maps.SymbolPath.CIRCLE, // Still available on global google.maps after core/maps loads
                                 fillColor: "#6366f1",
                                 fillOpacity: 1,
                                 strokeWeight: 2,
