@@ -30,6 +30,14 @@
                 "rating": "평점",
                 "view_map": "Google 지도에서 보기",
                 "more_info": "상세 정보 보기"
+            },
+            "voice": {
+                "start": "음성 안내를 시작합니다.",
+                "stop": "음성 안내를 중지합니다.",
+                "next_destination": "다음 목적지는 {name}입니다.",
+                "arrived": "{name}에 도착했습니다.",
+                "distance": "약 {dist}미터 남았습니다.",
+                "permission_denied": "위치 정보 또는 음성 권한이 거부되었습니다."
             }
         }
     },
@@ -64,6 +72,14 @@
                 "rating": "Rating",
                 "view_map": "Open in Google Maps",
                 "more_info": "View Details"
+            },
+            "voice": {
+                "start": "Starting voice guidance.",
+                "stop": "Stopping voice guidance.",
+                "next_destination": "The next destination is {name}.",
+                "arrived": "You have arrived at {name}.",
+                "distance": "About {dist} meters remaining.",
+                "permission_denied": "Location or voice permission denied."
             }
         }
     }

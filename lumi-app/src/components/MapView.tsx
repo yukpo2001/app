@@ -1,6 +1,7 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Loader } from "@googlemaps/js-api-loader";
 import { type Place } from "../lib/TravelContext";
 
 interface MapViewProps {
@@ -8,7 +9,108 @@ interface MapViewProps {
 }
 
 export const MapView = ({ places }: MapViewProps) => {
+    const mapRef = useRef<HTMLDivElement>(null);
+    const [map, setMap] = useState<google.maps.Map | null>(null);
     const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+
+    useEffect(() => {
+        if (!apiKey || !mapRef.current || !places || places.length === 0) return;
+
+        const loader = new Loader({
+            apiKey: apiKey,
+            version: "weekly",
+            libraries: ["places"]
+        });
+
+        loader.load().then(() => {
+            if (!mapRef.current) return;
+
+            const center = places[0].location
+                ? { lat: places[0].location.lat, lng: places[0].location.lng }
+                : { lat: 37.5665, lng: 126.9780 }; // Default Seoul
+
+            const newMap = new google.maps.Map(mapRef.current, {
+                center: center,
+                zoom: 14,
+                mapId: "LUMI_MAP_ID", // For premium styling if needed
+                disableDefaultUI: true,
+                zoomControl: true,
+                styles: [
+                    {
+                        "featureType": "all",
+                        "elementType": "labels.text.fill",
+                        "stylers": [{ "color": "#7c93a3" }, { "lightness": "-10" }]
+                    },
+                    {
+                        "featureType": "administrative.country",
+                        "elementType": "geometry",
+                        "stylers": [{ "visibility": "simplified" }, { "hue": "#ff0000" }]
+                    }
+                    // Simplified for brevity, can add more premium styles
+                ]
+            });
+
+            setMap(newMap);
+
+            const bounds = new google.maps.LatLngBounds();
+            const pathCoords: google.maps.LatLngLiteral[] = [];
+
+            places.forEach((place, index) => {
+                const position = place.location 
+                    ? { lat: place.location.lat, lng: place.location.lng } 
+                    : null;
+                
+                if (position) {
+                    bounds.extend(position);
+                    pathCoords.push(position);
+
+                    // Custom Marker with sequence number
+                    const marker = new google.maps.Marker({
+                        position: position,
+                        map: newMap,
+                        label: {
+                            text: (index + 1).toString(),
+                            color: "white",
+                            fontWeight: "bold"
+                        },
+                        title: place.name,
+                        icon: {
+                            path: google.maps.SymbolPath.CIRCLE,
+                            fillColor: "#6366f1", // primary color
+                            fillOpacity: 1,
+                            strokeWeight: 2,
+                            strokeColor: "#ffffff",
+                            scale: 15,
+                        }
+                    });
+
+                    const infoWindow = new google.maps.InfoWindow({
+                        content: `<div style="padding: 8px; color: #1e293b;"><p style="font-weight: bold; margin-bottom: 4px;">${place.name}</p><p style="font-size: 11px;">${place.category}</p></div>`
+                    });
+
+                    marker.addListener("click", () => {
+                        infoWindow.open(newMap, marker);
+                    });
+                }
+            });
+
+            // Draw Polyline (Connecting Path)
+            if (pathCoords.length > 1) {
+                new google.maps.Polyline({
+                    path: pathCoords,
+                    geodesic: true,
+                    strokeColor: "#6366f1",
+                    strokeOpacity: 0.8,
+                    strokeWeight: 3,
+                    map: newMap,
+                });
+            }
+
+            if (!bounds.isEmpty()) {
+                newMap.fitBounds(bounds);
+            }
+        });
+    }, [apiKey, places]);
 
     if (!apiKey) {
         return (
@@ -27,40 +129,10 @@ export const MapView = ({ places }: MapViewProps) => {
         );
     }
 
-    // Helper to get location string (prioritizes lat,lng coordinates over address)
-    const getLocString = (p: Place) => {
-        if (p.location && p.location.lat && p.location.lng) {
-            return `${p.location.lat},${p.location.lng}`;
-        }
-        return p.address;
-    };
-
-    // Google Maps Embed API - Directions Mode
-    const origin = encodeURIComponent(getLocString(places[0]));
-    const destination = encodeURIComponent(getLocString(places[places.length - 1]));
-
-    let waypoints = "";
-    if (places.length > 2) {
-        waypoints = places
-            .slice(1, -1)
-            .map(p => encodeURIComponent(getLocString(p)))
-            .join("|");
-    }
-
-    const mapUrl = `https://www.google.com/maps/embed/v1/directions?key=${apiKey}&origin=${origin}&destination=${destination}${waypoints ? `&waypoints=${waypoints}` : ""}&mode=driving`;
-
     return (
-        <div className="w-full h-80 md:h-96 rounded-[2.5rem] overflow-hidden shadow-inner border border-gray-100 mb-10 relative">
-            <iframe
-                title="Google Maps Route"
-                width="100%"
-                height="100%"
-                frameBorder="0"
-                style={{ border: 0 }}
-                src={mapUrl}
-                allowFullScreen
-            />
-            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-sm text-xs font-bold text-primary flex items-center gap-2">
+        <div className="w-full h-80 md:h-[450px] rounded-[2.5rem] overflow-hidden shadow-xl border border-white/20 mb-10 relative">
+            <div ref={mapRef} className="w-full h-full" />
+            <div className="absolute top-4 left-4 bg-white/90 backdrop-blur px-4 py-2 rounded-full shadow-lg text-xs font-bold text-primary flex items-center gap-2 z-10">
                 <span className="w-2 h-2 bg-primary rounded-full animate-pulse" />
                 Lumi 최적 동선 시뮬레이션
             </div>

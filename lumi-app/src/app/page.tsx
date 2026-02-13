@@ -15,6 +15,7 @@ import {
 import { PlaceDetailModal } from "../components/PlaceDetailModal";
 import { getTravelPersona } from "../lib/personality";
 import { ItineraryView } from "../components/ItineraryView";
+import { VoiceNavigator } from "../components/VoiceNavigator";
 
 type View = "landing" | "diagnose" | "result";
 
@@ -524,6 +525,8 @@ export default function Home() {
           Design by Antigravity x Lumi’s Pick
         </motion.p>
       )}
+      {/* Voice Guidance */}
+      <VoiceNavigator lang={language as "ko" | "en"} />
     </main>
   );
 }
