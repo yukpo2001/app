@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { Loader } from "@googlemaps/js-api-loader";
 import { type Place } from "../lib/TravelContext";
 
 interface MapViewProps {
@@ -16,100 +15,96 @@ export const MapView = ({ places }: MapViewProps) => {
     useEffect(() => {
         if (!apiKey || !mapRef.current || !places || places.length === 0) return;
 
-        const loader = new Loader({
-            apiKey: apiKey,
-            version: "weekly",
-            libraries: ["places"]
-        });
+        const loadGoogleMaps = async () => {
+            const { setOptions, importLibrary } = await import("@googlemaps/js-api-loader");
 
-        loader.load().then(() => {
-            if (!mapRef.current) return;
-
-            const center = places[0].location
-                ? { lat: places[0].location.lat, lng: places[0].location.lng }
-                : { lat: 37.5665, lng: 126.9780 }; // Default Seoul
-
-            const newMap = new google.maps.Map(mapRef.current, {
-                center: center,
-                zoom: 14,
-                mapId: "LUMI_MAP_ID", // For premium styling if needed
-                disableDefaultUI: true,
-                zoomControl: true,
-                styles: [
-                    {
-                        "featureType": "all",
-                        "elementType": "labels.text.fill",
-                        "stylers": [{ "color": "#7c93a3" }, { "lightness": "-10" }]
-                    },
-                    {
-                        "featureType": "administrative.country",
-                        "elementType": "geometry",
-                        "stylers": [{ "visibility": "simplified" }, { "hue": "#ff0000" }]
-                    }
-                    // Simplified for brevity, can add more premium styles
-                ]
+            setOptions({
+                key: apiKey,
+                v: "weekly",
             });
 
-            setMap(newMap);
+            try {
+                const { Map, InfoWindow } = await importLibrary("maps") as google.maps.MapsLibrary;
+                const { Marker } = await importLibrary("marker") as google.maps.MarkerLibrary;
+                const { Polyline } = await importLibrary("maps") as google.maps.MapsLibrary;
 
-            const bounds = new google.maps.LatLngBounds();
-            const pathCoords: google.maps.LatLngLiteral[] = [];
+                if (!mapRef.current) return;
 
-            places.forEach((place, index) => {
-                const position = place.location 
-                    ? { lat: place.location.lat, lng: place.location.lng } 
-                    : null;
-                
-                if (position) {
-                    bounds.extend(position);
-                    pathCoords.push(position);
+                const center = places[0].location
+                    ? { lat: places[0].location.lat, lng: places[0].location.lng }
+                    : { lat: 37.5665, lng: 126.9780 };
 
-                    // Custom Marker with sequence number
-                    const marker = new google.maps.Marker({
-                        position: position,
+                const newMap = new Map(mapRef.current, {
+                    center: center,
+                    zoom: 14,
+                    mapId: "LUMI_MAP_ID",
+                    disableDefaultUI: true,
+                    zoomControl: true,
+                });
+
+                setMap(newMap);
+
+                const bounds = new google.maps.LatLngBounds();
+                const pathCoords: google.maps.LatLngLiteral[] = [];
+
+                places.forEach((place, index) => {
+                    const position = place.location
+                        ? { lat: place.location.lat, lng: place.location.lng }
+                        : null;
+
+                    if (position) {
+                        bounds.extend(position);
+                        pathCoords.push(position);
+
+                        const marker = new Marker({
+                            position: position,
+                            map: newMap,
+                            label: {
+                                text: (index + 1).toString(),
+                                color: "white",
+                                fontWeight: "bold"
+                            },
+                            title: place.name,
+                            icon: {
+                                path: google.maps.SymbolPath.CIRCLE,
+                                fillColor: "#6366f1",
+                                fillOpacity: 1,
+                                strokeWeight: 2,
+                                strokeColor: "#ffffff",
+                                scale: 15,
+                            }
+                        });
+
+                        const infoWindow = new InfoWindow({
+                            content: `<div style="padding: 8px; color: #1e293b;"><p style="font-weight: bold; margin-bottom: 4px;">${place.name}</p><p style="font-size: 11px;">${place.category}</p></div>`
+                        });
+
+                        marker.addListener("click", () => {
+                            infoWindow.open(newMap, marker);
+                        });
+                    }
+                });
+
+                if (pathCoords.length > 1) {
+                    new Polyline({
+                        path: pathCoords,
+                        geodesic: true,
+                        strokeColor: "#6366f1",
+                        strokeOpacity: 0.8,
+                        strokeWeight: 3,
                         map: newMap,
-                        label: {
-                            text: (index + 1).toString(),
-                            color: "white",
-                            fontWeight: "bold"
-                        },
-                        title: place.name,
-                        icon: {
-                            path: google.maps.SymbolPath.CIRCLE,
-                            fillColor: "#6366f1", // primary color
-                            fillOpacity: 1,
-                            strokeWeight: 2,
-                            strokeColor: "#ffffff",
-                            scale: 15,
-                        }
-                    });
-
-                    const infoWindow = new google.maps.InfoWindow({
-                        content: `<div style="padding: 8px; color: #1e293b;"><p style="font-weight: bold; margin-bottom: 4px;">${place.name}</p><p style="font-size: 11px;">${place.category}</p></div>`
-                    });
-
-                    marker.addListener("click", () => {
-                        infoWindow.open(newMap, marker);
                     });
                 }
-            });
 
-            // Draw Polyline (Connecting Path)
-            if (pathCoords.length > 1) {
-                new google.maps.Polyline({
-                    path: pathCoords,
-                    geodesic: true,
-                    strokeColor: "#6366f1",
-                    strokeOpacity: 0.8,
-                    strokeWeight: 3,
-                    map: newMap,
-                });
+                if (!bounds.isEmpty()) {
+                    newMap.fitBounds(bounds);
+                }
+            } catch (error) {
+                console.error("Error loading Google Maps libraries:", error);
             }
+        };
 
-            if (!bounds.isEmpty()) {
-                newMap.fitBounds(bounds);
-            }
-        });
+        loadGoogleMaps();
     }, [apiKey, places]);
 
     if (!apiKey) {
