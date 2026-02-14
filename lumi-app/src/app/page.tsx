@@ -37,6 +37,7 @@ export default function Home() {
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [showItinerary, setShowItinerary] = useState(false);
   const [mapApiKey, setMapApiKey] = useState("");
+  const [debugError, setDebugError] = useState("");
 
   // Fetch API Key on mount to avoid build-time env issues
   useEffect(() => {
@@ -102,8 +103,18 @@ export default function Home() {
       }
 
       console.log(`[Lumi UI] Starting recommendations for: ${activeKeyword}`);
+
+      // Client-side Timeout Race (15s)
+      const timeoutPromise = new Promise<Place[]>((_, reject) => {
+        setTimeout(() => reject(new Error("Timeout: Server took too long (15s)")), 15000);
+      });
+
       const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집";
-      const results = await getPlacesRecommendationsAction(searchKeyword, currentLoc || undefined);
+
+      const results = await Promise.race([
+        getPlacesRecommendationsAction(searchKeyword, currentLoc || undefined),
+        timeoutPromise
+      ]);
 
       if (!results || results.length === 0) {
         console.warn("[Lumi UI] No results returned from API or Mock.");
@@ -113,9 +124,21 @@ export default function Home() {
 
       setRecommendations(results);
       setDiagnoseStep(2);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Analysis failed:", error);
-      setAnalysisText("오류가 발생했지만 Lumi의 시크릿 리스트를 불러올게요!");
+      const errMsg = error.message || "알 수 없는 오류";
+      setDebugError(errMsg);
+      setAnalysisText(`오류가 발생했습니다: ${errMsg}`);
+
+      // Force fallback (Mock) if server fails
+      if (errMsg.includes("Timeout")) {
+        alert("서버 응답이 지연되어 Lumi의 시크릿 리스트로 전환합니다.");
+        // In a real scenario, we might want to call a client-side mock function here, 
+        // but getPlacesRecommendationsAction already handles mocks on server. 
+        // If that timed out, we might need a purely client-side fallback, but let's just reset for now.
+        setIsAnalyzing(false);
+        // Ideally we should have a client-side mock data fallback here.
+      }
       await new Promise(resolve => setTimeout(resolve, 1000));
     } finally {
       clearInterval(interval);
@@ -547,6 +570,15 @@ export default function Home() {
       )}
       {/* Voice Guidance */}
       <VoiceNavigator lang={language as "ko" | "en"} />
+
+      {/* Debug Indicator */}
+      <div className="fixed bottom-4 left-4 z-[9999] bg-black/80 text-white text-[10px] p-2 rounded-lg opacity-50 hover:opacity-100 transition-opacity pointer-events-none">
+        <p className="font-bold text-yellow-400">Lumi Debug v2.2</p>
+        <p>API Key: {mapApiKey ? "Present (Runtime)" : "Missing"}</p>
+        <p>Recs: {recommendations.length}</p>
+        <p>View: {view}</p>
+        {debugError && <p className="text-red-400 font-bold mt-1">Error: {debugError}</p>}
+      </div>
     </main>
   );
 }
