@@ -5,7 +5,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 import { useTravel, type Place } from "../lib/TravelContext";
-import { getPlacesRecommendations } from "../lib/google-maps";
+import { getPlacesRecommendationsAction } from "../lib/actions";
 import { LumiCharacter } from "../components/LumiCharacter";
 import {
   MapPin, Utensils, Sparkles, Globe,
@@ -97,7 +97,7 @@ export default function Home() {
       }
 
       const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집";
-      const results = await getPlacesRecommendations(searchKeyword, currentLoc || undefined);
+      const results = await getPlacesRecommendationsAction(searchKeyword, currentLoc || undefined);
       setRecommendations(results);
       setDiagnoseStep(2);
     } catch (error) {

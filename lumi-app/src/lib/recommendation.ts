@@ -18,8 +18,10 @@ export interface Place {
 }
 
 export const rankPlacesByTaste = (places: Place[]) => {
-    const keywords = userTastes.style_keywords.map(kw => kw.toLowerCase());
-    const userReviewTexts = userTastes.reviews.map(r => r.text.toLowerCase());
+    if (!places || places.length === 0) return [];
+
+    const keywords = (userTastes.style_keywords || []).map(kw => (kw || "").toLowerCase());
+    const userReviewTexts = (userTastes.reviews || []).map(r => (r.text || "").toLowerCase());
 
     return places.map(place => {
         let score = 0;
