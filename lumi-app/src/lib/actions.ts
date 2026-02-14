@@ -16,3 +16,7 @@ export async function getPlacesRecommendationsAction(keyword: string, location?:
         return [];
     }
 }
+
+export async function getGoogleMapsApiKey() {
+    return process.env.GOOGLE_MAPS_API_KEY || "";
+}

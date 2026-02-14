@@ -1,11 +1,11 @@
 "use client";
 // Trigger redeploy for root directory change
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../lib/LanguageContext";
 import { useTravel, type Place } from "../lib/TravelContext";
-import { getPlacesRecommendationsAction } from "../lib/actions";
+import { getPlacesRecommendationsAction, getGoogleMapsApiKey } from "../lib/actions";
 import { LumiCharacter } from "../components/LumiCharacter";
 import {
   MapPin, Utensils, Sparkles, Globe,
@@ -36,6 +36,12 @@ export default function Home() {
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [useCurrentLocation, setUseCurrentLocation] = useState(false);
   const [showItinerary, setShowItinerary] = useState(false);
+  const [mapApiKey, setMapApiKey] = useState("");
+
+  // Fetch API Key on mount to avoid build-time env issues
+  useEffect(() => {
+    getGoogleMapsApiKey().then(setMapApiKey);
+  }, []);
 
   const toggleLanguage = () => {
     setLanguage(language === "ko" ? "en" : "ko");
@@ -497,7 +503,7 @@ export default function Home() {
               className="absolute inset-0 bg-black/60 backdrop-blur-md"
             />
             <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto custom-scrollbar rounded-[3rem]">
-              <ItineraryView onClose={() => setShowItinerary(false)} />
+              <ItineraryView onClose={() => setShowItinerary(false)} apiKey={mapApiKey} />
             </div>
           </div>
         )}

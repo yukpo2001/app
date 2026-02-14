@@ -5,12 +5,13 @@ import { type Place } from "../lib/TravelContext";
 
 interface MapViewProps {
     places: Place[];
+    apiKey?: string;
 }
 
-export const MapView = ({ places }: MapViewProps) => {
+export const MapView = ({ places, apiKey: propApiKey }: MapViewProps) => {
     const mapRef = useRef<HTMLDivElement>(null);
     const [map, setMap] = useState<google.maps.Map | null>(null);
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    const apiKey = propApiKey || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     useEffect(() => {
         if (!apiKey || !mapRef.current || !places || places.length === 0) return;

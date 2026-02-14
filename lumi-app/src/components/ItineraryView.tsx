@@ -7,7 +7,7 @@ import { useTravel, type Place } from "../lib/TravelContext";
 import { optimizeRoute } from "../lib/recommendation";
 import { MapView } from "./MapView";
 
-export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
+export const ItineraryView = ({ onClose, apiKey }: { onClose: () => void; apiKey?: string }) => {
     const { itinerary, removeFromItinerary, setItinerary, shareLink } = useTravel();
     const [isOptimizing, setIsOptimizing] = useState(false);
     const [weather, setWeather] = useState("Sunny");
@@ -70,7 +70,7 @@ export const ItineraryView = ({ onClose }: { onClose: () => void }) => {
                 </div>
             </div>
 
-            <MapView places={displayItinerary} />
+            <MapView places={displayItinerary} apiKey={apiKey} />
 
             {itinerary.length === 0 ? (
                 <div className="py-20 text-center bg-gray-50/50 rounded-[2.5rem] border-2 border-dashed border-gray-200">
