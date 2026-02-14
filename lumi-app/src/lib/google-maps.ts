@@ -18,7 +18,7 @@ function getMockFallback(message: string): Place[] {
 }
 
 export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }): Promise<Place[]> {
-    const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+    const API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
 
     // Stage 1: Check API Key
     if (!API_KEY) {
@@ -130,7 +130,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 }
 
 export async function getFollowUpRecommendation(currentPlace: any) {
-    const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+    const API_KEY = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
     if (!API_KEY || !currentPlace.location) return null;
 
     const categories: Record<string, string> = {

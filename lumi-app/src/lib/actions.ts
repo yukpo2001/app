@@ -18,5 +18,7 @@ export async function getPlacesRecommendationsAction(keyword: string, location?:
 }
 
 export async function getGoogleMapsApiKey() {
-    return process.env.GOOGLE_MAPS_API_KEY || "";
+    const key = process.env.GOOGLE_MAPS_API_KEY || process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+    console.log(`[Lumi Server Action] API Key Check: ${key ? "Present" : "Missing"}`);
+    return key || "";
 }
