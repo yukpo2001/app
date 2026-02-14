@@ -1,33 +1,35 @@
 "use server";
 
-import { rankPlacesByTaste } from "./recommendation";
+import { rankPlacesByTaste, type Place } from "./recommendation";
+import mockData from "../data/mock_reviews.json";
 
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
-export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }) {
-    // If API Key is missing, use mock data as a fallback to ensure the app stays "alive" for testing/demo
+/**
+ * Helper to wrap mock data with consistent structure
+ */
+function getMockFallback(message: string): Place[] {
+    console.warn(`[Lumi Fallback] ${message}`);
+    const results = (mockData as any[]).map(item => ({
+        ...item,
+        reviews: item.reviews || [],
+        tasteScore: 10,
+        lumiTip: `${message} 기분 좋은 하루 되세요! ✨`
+    }));
+    return rankPlacesByTaste(results);
+}
+
+export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }): Promise<Place[]> {
+    // Stage 1: Check API Key
     if (!GOOGLE_MAPS_API_KEY) {
-        console.warn("[Lumi] GOOGLE_MAPS_API_KEY is not defined. Falling back to Mock Data.");
-        try {
-            const mockData = (await import("../data/mock_reviews.json")).default;
-            return (mockData as any[]).map(item => ({
-                ...item,
-                reviews: [], // Adding missing field for type safety
-                tasteScore: 10,
-                lumiTip: "API 키가 설정되지 않아 샘플 데이터를 보여드려요! Vercel 설정을 확인해주세요. ✨"
-            }));
-        } catch (e) {
-            console.error("Failed to load mock data:", e);
-            return [];
-        }
+        return getMockFallback("환경 변수(API Key)가 설정되지 않아 샘플 데이터를 준비했어요.");
     }
 
     try {
         const url = "https://places.googleapis.com/v1/places:searchText";
 
-        // Helper function for the core search request
         async function performSearch(query: string, loc?: { lat: number; lng: number }) {
-            console.log(`[API Call] Query: "${query}", Location:`, loc || "Global");
+            console.log(`[Lumi API] Attempting: "${query}"`, loc ? `at [${loc.lat}, ${loc.lng}]` : "(Global)");
 
             const searchBody: any = {
                 textQuery: query,
@@ -56,50 +58,41 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 
             if (!response.ok) {
                 const errText = await response.text();
-                console.error(`[Lumi API] Google API Error (${response.status}):`, errText);
+                console.error(`[Lumi API] Error (${response.status}):`, errText);
                 return null;
             }
 
-            const result = await response.json();
-            if (result.error) {
-                console.error(`[Lumi API] Structured Error:`, JSON.stringify(result.error, null, 2));
-                return null;
-            }
-            return result;
+            const res = await response.json();
+            return res.places || [];
         }
 
-        // --- Step By Step Fallback Strategy ---
+        // --- Progressive Fallback Execution ---
+        let places: any[] = [];
 
-        // 1. Initial Search (Keyword + Local)
-        let data = await performSearch(keyword, location);
-        let places = data?.places || [];
+        // 1. Primary: Keyword + Local
+        places = await performSearch(keyword, location) || [];
 
-        // 2. Fallback: Keyword alone (Global Search)
+        // 2. Fallback: Keyword Global
         if (places.length === 0 && location) {
-            console.log("No local results for keyword. Retrying globally...");
-            data = await performSearch(keyword, undefined);
-            if (data?.places) places = data.places;
+            places = await performSearch(keyword) || [];
         }
 
-        // 3. Fallback: General category + Local
+        // 3. Fallback: Broader Category locally (e.g., replace 'hip' with general term)
         if (places.length === 0) {
-            console.log("Still no results. Retrying with general category locally...");
-            const generalKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
-            data = await performSearch(generalKeyword, location);
-            if (data?.places) places = data.places;
+            const broadKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
+            if (broadKeyword !== keyword) {
+                places = await performSearch(broadKeyword, location) || [];
+            }
         }
 
-        // 4. Final Fallback: General category alone
+        // 4. Fallback: "Cafe" or "Restaurant" as absolute defaults
         if (places.length === 0) {
-            console.log("Absolute zero. Retrying with general category globally...");
-            const generalKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
-            data = await performSearch(generalKeyword, undefined);
-            if (data?.places) places = data.places;
+            places = await performSearch("인기 맛집 카페", location) || [];
         }
 
+        // --- Final Check & Transformation ---
         if (places.length === 0) {
-            console.warn("All fallback stages failed. No results found.");
-            return [];
+            return getMockFallback("검색 결과가 없어 Lumi의 특별 추천 리스트를 준비했어요.");
         }
 
         const results = places.map((place: any) => ({
@@ -127,15 +120,14 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 
         return rankPlacesByTaste(results);
     } catch (error) {
-        console.error("Critical error in getPlacesRecommendations:", error);
-        return [];
+        console.error("[Lumi] Critical error in search:", error);
+        return getMockFallback("시스템 연결에 문제가 생겨 Lumi의 시크릿 리스트를 보여드려요!");
     }
 }
 
 export async function getFollowUpRecommendation(currentPlace: any) {
     if (!GOOGLE_MAPS_API_KEY || !currentPlace.location) return null;
 
-    // Define complementary categories
     const categories: Record<string, string> = {
         'restaurant': 'cafe',
         'food': 'cafe',
@@ -148,7 +140,10 @@ export async function getFollowUpRecommendation(currentPlace: any) {
     const targetCategory = categories[currentPlace.category] || 'cafe';
     const query = `${targetCategory} 힙한 곳`;
 
-    const results = await getPlacesRecommendations(query, currentPlace.location);
-    // Return the top-ranked complementary place (excluding the current one)
-    return results.find(p => p.id !== currentPlace.id) || null;
+    try {
+        const results = await getPlacesRecommendations(query, currentPlace.location);
+        return results.find(p => p.id !== currentPlace.id) || null;
+    } catch {
+        return null;
+    }
 }
