@@ -112,8 +112,14 @@ export const MapView = ({ places, apiKey: propApiKey }: MapViewProps) => {
     if (!apiKey) {
         return (
             <div className="w-full h-64 bg-red-50 border-2 border-dashed border-red-200 rounded-[2rem] flex flex-col items-center justify-center text-red-400 p-8 text-center">
-                <p className="font-bold mb-2">Google Maps API 키를 찾을 수 없습니다.</p>
-                <p className="text-xs">.env.local 파일에 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY가 설정되어 있는지 확인해 주세요.</p>
+                <p className="font-bold mb-2">Google Maps 로딩 실패</p>
+                <p className="text-xs mb-4">API 키를 불러오지 못했습니다. 네트워크 상태를 확인해주세요.</p>
+                <button
+                    onClick={() => window.location.reload()}
+                    className="px-4 py-2 bg-red-100 hover:bg-red-200 text-red-500 rounded-lg text-xs font-bold transition-colors"
+                >
+                    페이지 새로고침
+                </button>
             </div>
         );
     }

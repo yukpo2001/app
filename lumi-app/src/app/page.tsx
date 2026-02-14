@@ -41,8 +41,19 @@ export default function Home() {
 
   // Fetch API Key on mount to avoid build-time env issues
   useEffect(() => {
-    getGoogleMapsApiKey().then(setMapApiKey);
+    fetchApiKey();
   }, []);
+
+  const fetchApiKey = async () => {
+    try {
+      const key = await getGoogleMapsApiKey();
+      if (key) setMapApiKey(key);
+      else console.warn("[Lumi UI] API Key fetched but empty");
+    } catch (e) {
+      console.error("[Lumi UI] API Key fetch failed:", e);
+      setDebugError("API Key Fetch Failed");
+    }
+  };
 
   const toggleLanguage = () => {
     setLanguage(language === "ko" ? "en" : "ko");
