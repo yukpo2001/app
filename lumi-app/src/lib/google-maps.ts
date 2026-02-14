@@ -3,8 +3,6 @@
 import { rankPlacesByTaste, type Place } from "./recommendation";
 import mockData from "../data/mock_reviews.json";
 
-const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-
 /**
  * Helper to wrap mock data with consistent structure
  */
@@ -20,8 +18,10 @@ function getMockFallback(message: string): Place[] {
 }
 
 export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }): Promise<Place[]> {
+    const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+
     // Stage 1: Check API Key
-    if (!GOOGLE_MAPS_API_KEY) {
+    if (!API_KEY) {
         return getMockFallback("환경 변수(API Key)가 설정되지 않아 샘플 데이터를 준비했어요.");
     }
 
@@ -50,7 +50,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "X-Goog-Api-Key": GOOGLE_MAPS_API_KEY as string,
+                    "X-Goog-Api-Key": API_KEY as string,
                     "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews,places.location"
                 },
                 body: JSON.stringify(searchBody),
@@ -77,7 +77,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             places = await performSearch(keyword) || [];
         }
 
-        // 3. Fallback: Broader Category locally (e.g., replace 'hip' with general term)
+        // 3. Fallback: Broader Category locally
         if (places.length === 0) {
             const broadKeyword = keyword.replace(/힙한\s*곳|힙한\s*핫플\s*맛집/g, "맛집").trim();
             if (broadKeyword !== keyword) {
@@ -85,7 +85,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             }
         }
 
-        // 4. Fallback: "Cafe" or "Restaurant" as absolute defaults
+        // 4. Fallback: Absolute defaults
         if (places.length === 0) {
             places = await performSearch("인기 맛집 카페", location) || [];
         }
@@ -96,24 +96,24 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
         }
 
         const results = places.map((place: any) => ({
-            id: place.id,
+            id: place.id || Math.random().toString(36).substr(2, 9),
             name: place.displayName?.text || "Unknown Place",
             category: place.types?.[0] || "Location",
-            rating: place.rating || 0,
+            rating: place.rating || 4.2, // Default rating if missing
             review: place.reviews?.[0]?.text?.text || "실시간 리뷰 정보가 없습니다.",
             reviews: (place.reviews || []).map((r: any) => ({
-                author: r.authorAttribution?.displayName,
-                text: r.text?.text,
-                rating: r.rating,
-                publishTime: r.relativePublishTimeDescription
+                author: r.authorAttribution?.displayName || "익명",
+                text: r.text?.text || "",
+                rating: r.rating || 5,
+                publishTime: r.relativePublishTimeDescription || ""
             })),
             tags: (place.types || []).slice(0, 3).map((t: string) => t.replace(/_/g, " ")),
             address: place.formattedAddress || "주소 정보 없음",
             phone: place.nationalPhoneNumber || "전화번호 정보 없음",
             hours: place.regularOpeningHours?.weekdayDescriptions?.[0] || "영업시간 정보 없음",
-            mapUrl: place.googleMapsUri,
+            mapUrl: place.googleMapsUri || "#",
             imageUrl: place.photos?.[0]
-                ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${GOOGLE_MAPS_API_KEY}&maxWidthPx=800`
+                ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?key=${API_KEY}&maxWidthPx=800`
                 : "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&q=80&w=800",
             location: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : undefined
         }));
@@ -126,7 +126,8 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 }
 
 export async function getFollowUpRecommendation(currentPlace: any) {
-    if (!GOOGLE_MAPS_API_KEY || !currentPlace.location) return null;
+    const API_KEY = process.env.GOOGLE_MAPS_API_KEY;
+    if (!API_KEY || !currentPlace.location) return null;
 
     const categories: Record<string, string> = {
         'restaurant': 'cafe',
