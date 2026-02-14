@@ -21,7 +21,15 @@ export const rankPlacesByTaste = (places: Place[]) => {
     if (!places || places.length === 0) return [];
 
     const keywords = (userTastes.style_keywords || []).map(kw => (kw || "").toLowerCase());
-    const userReviewTexts = (userTastes.reviews || []).map(r => (r.text || "").toLowerCase());
+
+    // Optimization: Pre-process user review vocabulary once instead of iterating 5500+ times per place
+    // We only care about unique significant words yukpo2001 uses frequently
+    const userVocabMap = new Map<string, number>();
+    (userTastes.reviews || []).slice(0, 1000).forEach(r => { // Cap to latest 1000 for performance
+        if (!r.text) return;
+        const words = r.text.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+        words.forEach(w => userVocabMap.set(w, (userVocabMap.get(w) || 0) + 1));
+    });
 
     return places.map(place => {
         let score = 0;
@@ -30,31 +38,32 @@ export const rankPlacesByTaste = (places: Place[]) => {
         place.tags.forEach(tag => {
             const normalizedTag = tag.toLowerCase();
             if (keywords.some(kw => normalizedTag.includes(kw) || kw.includes(normalizedTag))) {
-                score += 2;
+                score += 3; // Increased weight
             }
         });
 
         // 2. Review content matching (keywords)
-        const allReviewsText = place.reviews.map(r => r.text).join(" ").toLowerCase();
+        const allReviewsText = (place.reviews || []).map(r => r.text).join(" ").toLowerCase();
         keywords.forEach(kw => {
             if (allReviewsText.includes(kw)) {
-                score += 1.5;
+                score += 2;
             }
         });
 
-        // 3. User similarity (Lexical overlap)
-        // Bonus for places whose reviews contain common descriptive adjectives used by the user
-        userReviewTexts.forEach(userTxt => {
-            if (!userTxt) return;
-            // Extract some descriptive words (heuristic: words $> 3$ chars)
-            const words = userTxt.split(/\s+/).filter(w => w.length > 3);
-            const matches = words.filter(w => allReviewsText.includes(w));
-            score += matches.length * 0.05;
+        // 3. User similarity (Optimized)
+        // Check how many of yukpo2001's frequent words appear in this place's reviews
+        userVocabMap.forEach((count, word) => {
+            if (allReviewsText.includes(word)) {
+                score += Math.min(count * 0.1, 1); // Cap individual word contribution
+            }
         });
 
-        // 4. Generate Lumi's Tip
+        // 4. Rating bonus
+        score += (place.rating || 0) * 0.5;
+
+        // 5. Generate Lumi's Tip
         let tip = "여기는 yukpo2001님이 좋아하실 만한 분위기에요!";
-        if (score > 10) {
+        if (score > 20) {
             tip = "완전 yukpo2001님 스타일! 평소 좋아하시는 정갈하고 깔끔한 분위기가 가득해요. ✨";
         } else if (allReviewsText.includes("친절") || allReviewsText.includes("서비스")) {
             tip = "친절한 서비스로 유명한 곳이에요. yukpo2001님이 중요하게 생각하시는 부분이죠! 😊";

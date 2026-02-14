@@ -56,30 +56,30 @@ export default function Home() {
     setDiagnoseStep(1);
 
     const phrases = [
-      "실시간 구글 지도 데이터를 불러오고 있어요...",
-      "yukpo2001님의 과거 리뷰 스타일을 분석 중입니다...",
-      "유저 리뷰들과 yukpo2001님의 취향을 매칭하고 있어요...",
-      "당신의 취향을 Lumi가 완벽히 파악하는 중이에요!",
-      "가장 힙하고 yukpo2001님이 좋아하실 곳을 선정 중입니다..."
+      "Lumi의 분석 엔진이 쌩쌩 돌아가고 있어요!",
+      "구글 지도의 실시간 힙스팟 데이터를 수집 중입니다...",
+      "yukpo2001님의 과거 리뷰에서 스타일 테마를 추출하고 있어요...",
+      "5,500개의 유저 데이터와 yukpo2001님의 취향을 정교하게 매칭 중!",
+      "거의 다 됐어요! 가장 힙하고 yukpo2001님 스타일인 곳들만 골라낼게요. ✨"
     ];
 
     let phraseIdx = 0;
     const interval = setInterval(() => {
       setAnalysisText(phrases[phraseIdx % phrases.length]);
       phraseIdx++;
-    }, 1200);
+    }, 1500);
 
     try {
       let currentLoc = location;
 
       // Only check location if user has explicitly opted in
       if (useCurrentLocation && !currentLoc) {
-        setAnalysisText("현재 위치를 확인하고 있어요...");
+        setAnalysisText("현재 위치를 확인하고 있어요... (위치 권한을 확인해주세요)");
         try {
           const position = await new Promise<GeolocationPosition>((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
               enableHighAccuracy: true,
-              timeout: 10000, // Increased to 10s
+              timeout: 10000,
               maximumAge: 0
             });
           });
@@ -90,24 +90,33 @@ export default function Home() {
           setLocation(currentLoc);
         } catch (error: any) {
           console.error("Geolocation failed:", error);
-          let errorMsg = "위치 정보를 가져올 수 없어 일반 검색으로 진행합니다.";
+          let errorMsg = "현재 위치를 알 수 없어 광역 검색으로 전환합니다.";
           if (error.code === 1) {
-            errorMsg = "위치 권한이 거부되었습니다. 일반 검색으로 진행합니다.";
+            errorMsg = "위치 권한이 차단되어 광역 검색으로 진행합니다.";
           } else if (error.code === 3) {
-            errorMsg = "위치 확인 시간이 초과되었습니다. 일반 검색으로 진행합니다.";
+            errorMsg = "위치 응답이 늦어 광역 검색으로 전환합니다.";
           }
           setAnalysisText(errorMsg);
-          // Small delay to let user read the error message
-          await new Promise(resolve => setTimeout(resolve, 2000));
+          await new Promise(resolve => setTimeout(resolve, 1500));
         }
       }
 
+      console.log(`[Lumi UI] Starting recommendations for: ${activeKeyword}`);
       const searchKeyword = activeKeyword.trim() || "성수동 힙한 카페 맛집";
       const results = await getPlacesRecommendationsAction(searchKeyword, currentLoc || undefined);
+
+      if (!results || results.length === 0) {
+        console.warn("[Lumi UI] No results returned from API or Mock.");
+      } else {
+        console.log(`[Lumi UI] Received ${results.length} recommendations.`);
+      }
+
       setRecommendations(results);
       setDiagnoseStep(2);
     } catch (error) {
       console.error("Analysis failed:", error);
+      setAnalysisText("오류가 발생했지만 Lumi의 시크릿 리스트를 불러올게요!");
+      await new Promise(resolve => setTimeout(resolve, 1000));
     } finally {
       clearInterval(interval);
       setIsAnalyzing(false);

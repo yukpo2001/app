@@ -92,10 +92,13 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 
         // --- Final Check & Transformation ---
         if (places.length === 0) {
-            return getMockFallback("검색 결과가 없어 Lumi의 특별 추천 리스트를 준비했어요.");
+            console.log(`[Lumi] No results found for "${keyword}". Triggering mock fallback.`);
+            return getMockFallback(`'${keyword}'에 대한 검색 결과가 구글 지도에 없어서 Lumi의 시크릿 리스트를 특별히 준비했어요!`);
         }
 
-        const results = places.map((place: any) => ({
+        const filteredPlaces = places.slice(0, 10); // Limit to top 10 for performance
+
+        const results = filteredPlaces.map((place: any) => ({
             id: place.id || Math.random().toString(36).substr(2, 9),
             name: place.displayName?.text || "Unknown Place",
             category: place.types?.[0] || "Location",
@@ -118,10 +121,11 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
             location: place.location ? { lat: place.location.latitude, lng: place.location.longitude } : undefined
         }));
 
+        console.log(`[Lumi] Successfully transformed ${results.length} places. Ranking now...`);
         return rankPlacesByTaste(results);
     } catch (error) {
         console.error("[Lumi] Critical error in search:", error);
-        return getMockFallback("시스템 연결에 문제가 생겨 Lumi의 시크릿 리스트를 보여드려요!");
+        return getMockFallback("구글 시스템 연결이 불안정해서 Lumi가 아끼는 장소들로 대신 구성해봤어요!");
     }
 }
 
