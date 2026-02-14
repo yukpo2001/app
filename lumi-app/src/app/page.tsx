@@ -396,12 +396,17 @@ export default function Home() {
                     현재 계신 곳 주변에는 아직 분석된 힙한 장소가 적을 수 있습니다.<br />
                     범위를 넓혀서 다시 찾아볼까요?
                   </p>
-                  <button
-                    onClick={() => startAnalysis(keyword)}
-                    className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
-                  >
-                    다시 찾아보기
-                  </button>
+                  <div className="flex flex-col gap-4 items-center">
+                    <button
+                      onClick={() => startAnalysis(keyword)}
+                      className="px-8 py-4 bg-primary text-white rounded-2xl font-bold hover:scale-105 transition-all shadow-lg"
+                    >
+                      다시 찾아보기
+                    </button>
+                    <p className="text-[10px] text-gray-400 mt-4">
+                      ※ 장소가 계속 나타나지 않는다면 Vercel 설정에서 <b>GOOGLE_MAPS_API_KEY</b> 환경 변수를 확인해 주세요.
+                    </p>
+                  </div>
                 </div>
               ) : (
                 recommendations.map((item: Place, idx: number) => (

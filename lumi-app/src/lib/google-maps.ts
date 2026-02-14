@@ -5,9 +5,21 @@ import { rankPlacesByTaste } from "./recommendation";
 const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
 
 export async function getPlacesRecommendations(keyword: string, location?: { lat: number; lng: number }) {
+    // If API Key is missing, use mock data as a fallback to ensure the app stays "alive" for testing/demo
     if (!GOOGLE_MAPS_API_KEY) {
-        console.error("GOOGLE_MAPS_API_KEY is not defined");
-        return [];
+        console.warn("[Lumi] GOOGLE_MAPS_API_KEY is not defined. Falling back to Mock Data.");
+        try {
+            const mockData = (await import("../data/mock_reviews.json")).default;
+            return (mockData as any[]).map(item => ({
+                ...item,
+                reviews: [], // Adding missing field for type safety
+                tasteScore: 10,
+                lumiTip: "API 키가 설정되지 않아 샘플 데이터를 보여드려요! Vercel 설정을 확인해주세요. ✨"
+            }));
+        } catch (e) {
+            console.error("Failed to load mock data:", e);
+            return [];
+        }
     }
 
     try {
@@ -44,11 +56,16 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
 
             if (!response.ok) {
                 const errText = await response.text();
-                console.error(`Google API Error (${response.status}):`, errText);
+                console.error(`[Lumi API] Google API Error (${response.status}):`, errText);
                 return null;
             }
 
-            return await response.json();
+            const result = await response.json();
+            if (result.error) {
+                console.error(`[Lumi API] Structured Error:`, JSON.stringify(result.error, null, 2));
+                return null;
+            }
+            return result;
         }
 
         // --- Step By Step Fallback Strategy ---
