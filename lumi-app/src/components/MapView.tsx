@@ -107,6 +107,17 @@ export const MapView = ({ places, apiKey: propApiKey }: MapViewProps) => {
         };
 
         loadGoogleMaps();
+
+        // Global handler for Google Maps Auth Failures (Billing, API not enabled, etc.)
+        (window as any).gm_authFailure = () => {
+            console.error("[Lumi] Google Maps Auth Failure detected.");
+            alert("Google Maps 로드 실패: 결제 계정이 연결되지 않았거나 API가 활성화되지 않았습니다. Google Cloud Console을 확인해주세요.");
+        };
+
+        return () => {
+            // Cleanup
+            (window as any).gm_authFailure = () => { };
+        };
     }, [apiKey, places]);
 
     if (!apiKey) {
