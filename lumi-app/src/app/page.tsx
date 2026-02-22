@@ -38,10 +38,16 @@ export default function Home() {
   const [showItinerary, setShowItinerary] = useState(false);
   const [mapApiKey, setMapApiKey] = useState("");
   const [debugError, setDebugError] = useState("");
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [isInAppBannerDismissed, setIsInAppBannerDismissed] = useState(false);
 
   // Fetch API Key on mount to avoid build-time env issues
   useEffect(() => {
     fetchApiKey();
+    // 인앱 브라우저 감지
+    const ua = navigator.userAgent;
+    const inApp = /KAKAOTALK|Instagram|NAVER|FB_IAB|FBIOS|NaverApp|Line\/|Twitter|Snapchat|TikTok|Bytedance/i.test(ua);
+    setIsInAppBrowser(inApp);
   }, []);
 
   const fetchApiKey = async () => {
@@ -185,6 +191,29 @@ export default function Home() {
 
   return (
     <main className="relative min-h-[100dvh] flex flex-col p-4 overflow-x-hidden">
+      {/* 인앱 브라우저 경고 배너 */}
+      {isInAppBrowser && !isInAppBannerDismissed && (
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-gradient-to-r from-amber-500 to-orange-500 text-white px-4 py-3 shadow-lg">
+          <div className="max-w-2xl mx-auto flex items-start gap-3">
+            <span className="text-2xl flex-shrink-0">⚠️</span>
+            <div className="flex-1">
+              <p className="font-bold text-sm mb-0.5">인앱 브라우저에서는 일부 기능이 제한될 수 있어요</p>
+              <p className="text-xs text-white/90">
+                카카오톡·인스타그램 등 앱 내 브라우저는 Google 서비스 접근이 차단됩니다.
+                <br />
+                오른쪽 상단 <strong>⋮ → 기본 브라우저로 열기</strong>를 눌러주세요!
+              </p>
+            </div>
+            <button
+              onClick={() => setIsInAppBannerDismissed(true)}
+              className="flex-shrink-0 text-white/80 hover:text-white text-xl leading-none p-1"
+              aria-label="닫기"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
       {/* Language Toggle */}
       <motion.button
         initial={{ opacity: 0 }}
