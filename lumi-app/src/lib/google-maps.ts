@@ -51,8 +51,7 @@ export async function getPlacesRecommendations(keyword: string, location?: { lat
                 headers: {
                     "Content-Type": "application/json",
                     "X-Goog-Api-Key": API_KEY as string,
-                    "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews,places.location",
-                    "Referer": "https://app-seven-kappa-52.vercel.app/" // Force verify API Key Check
+                    "X-Goog-FieldMask": "places.id,places.displayName,places.formattedAddress,places.rating,places.nationalPhoneNumber,places.regularOpeningHours,places.googleMapsUri,places.photos,places.types,places.reviews,places.location"
                 },
                 body: JSON.stringify(searchBody),
             });
