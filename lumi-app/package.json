@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^2.0.2",
+    "@notionhq/client": "^5.9.0",
     "@types/google.maps": "^3.58.1",
     "clsx": "^2.1.1",
     "framer-motion": "^12.31.1",
