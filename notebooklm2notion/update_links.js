@@ -103,7 +103,32 @@ const NOTEBOOK_URLS = {
   "Google Web MCP: Solving AI Agent Browser Limitations": "https://notebooklm.google.com/notebook/400f50c1-9caa-4628-bd09-b90bd615fbdf",
   "The Rockefeller Waterfall: Building a Perpetual Family Bank": "https://notebooklm.google.com/notebook/b5305f4e-2d4f-48f3-9ac4-0a6f18034a06",
   "운과 커리어": "https://notebooklm.google.com/notebook/f651ac88-1896-4991-af4b-7bc4a566d2dc",
-  "폰없는 미래": "https://notebooklm.google.com/notebook/8e9a8a15-62ff-40a1-a141-3bb20ee9e6bb"
+  "폰없는 미래": "https://notebooklm.google.com/notebook/8e9a8a15-62ff-40a1-a141-3bb20ee9e6bb",
+
+  // === 5차 수집 URL ===
+  "skills (단독)": "https://notebooklm.google.com/notebook/13f00220-859d-4fcf-a44f-03c53c813972",
+  "Full-Stack Development with Google AI Studio and Antigravity": "https://notebooklm.google.com/notebook/b2674929-f81e-4330-9969-49598b799f31",
+  "The 95 Percent System: Mastering AI Workflow Engineering": "https://notebooklm.google.com/notebook/3e4811da-5c68-4de2-8420-bb6a09354b7c",
+  "Installing OpenClaw on Windows and Creating AI Agents": "https://notebooklm.google.com/notebook/2271df4a-c1b1-40a8-8c63-5fd905c95ffd",
+  "Transforming Old Laptops into Private OpenClaw AI Servers": "https://notebooklm.google.com/notebook/9764ceac-65f2-44ed-b647-d224c52f7e62",
+  "The AI Safety Expert: Roman Yampolskiy on Super Intelligence Risks": "https://notebooklm.google.com/notebook/fc35a791-7ccf-4aa0-8c44-ca2ec253f7c4",
+  "Google Gemini Gems: Zero-Code AI Workflow Automation Guide": "https://notebooklm.google.com/notebook/1923ee7e-16cc-4d9d-9f00-5a044c3a1c8b",
+  "Professional Profile and Brewing Career of Yun Hyeon": "https://notebooklm.google.com/notebook/4ad735d2-707d-4e88-984b-687039f9c9eb",
+  "The Rise of Clawdbot: A Local AI Paradigm Shift": "https://notebooklm.google.com/notebook/49ca0609-a791-4095-b468-bcc98ff4489e",
+  "The Architecture of AI Hallucinations and How to Tame Them": "https://notebooklm.google.com/notebook/dcfcb954-e61e-4e59-aef4-2dbd8ceb5f85",
+  "AI Business Plan Writing Strategies with Gemini": "https://notebooklm.google.com/notebook/a556182f-bc0a-4efe-b2cb-b091f17b7edb",
+  "AI Agentic Smart Collar Development Strategy": "https://notebooklm.google.com/notebook/7c642cc3-2187-422c-8b3a-3c72d567ce48",
+  "Domestic Pet Care and Monitoring Robotics Market Analysis": "https://notebooklm.google.com/notebook/a6aecbe2-ab69-4f53-8951-bd59a9c7b17d",
+  "Psychological Archetypes in Brand Identity": "https://notebooklm.google.com/notebook/eddc75c7-d840-43ff-9e66-05c5dffd8242",
+  "Cornering Success: How Mo Seori Conquered the Global Market": "https://notebooklm.google.com/notebook/04b161df-99d1-402f-81b1-b711bf3c150e",
+  "Beyond Traffic: Master the Psychology of High-Value Conversion": "https://notebooklm.google.com/notebook/c9ad0669-f0cc-4b56-88e4-6c14873f460f",
+  "2026 Monthly Fortune and Financial Success Guide": "https://notebooklm.google.com/notebook/294784a0-5b72-4209-bac1-81a1b5eec63e",
+  "2026 지원사업": "https://notebooklm.google.com/notebook/51a655fc-4113-46dd-9efa-520d251d82b3",
+  "2026 농지연금 가입 자격 및 수령액 완전 가이드": "https://notebooklm.google.com/notebook/f47f7242-d236-4486-a33b-f26ba484cc26",
+  "2026 AI Basic Act: A Comprehensive Guide to New Rules": "https://notebooklm.google.com/notebook/eab8bd35-c841-4334-994b-84d860cf163f",
+  "에일리언브루잉 용역: Regional Beer Development Report": "https://notebooklm.google.com/notebook/63289999-4405-48c4-b0bf-8b0456b2a589",
+  "존 어리 <모빌리티(Mobilities)>": "https://notebooklm.google.com/notebook/6f780e87-b551-48eb-8c7a-dfd91ad5f135",
+  "Local LLM": "https://notebooklm.google.com/notebook/54489ee2-a6cf-47f1-a5e6-4be134540cf3"
 };
 
 /** DB에서 모든 페이지 가져오기 */
