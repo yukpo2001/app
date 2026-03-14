@@ -124,8 +124,11 @@ ${bodyText.substring(0, 2000)}
       
       console.log("-> Saved to Notion.");
       
-      // Discord Notification
-      if (discordClient && process.env.DISCORD_CHANNEL_ID) {
+      // Discord Notification (Report only if Important or Urgent)
+      const isImportant = aiResult.importance.includes('High');
+      const isUrgent = aiResult.urgency.includes('긴급');
+      
+      if (discordClient && process.env.DISCORD_CHANNEL_ID && (isImportant || isUrgent)) {
         try {
           const channel = await discordClient.channels.fetch(process.env.DISCORD_CHANNEL_ID);
           if (channel) {
