@@ -69,8 +69,42 @@ def ask_notebooklm(question: str) -> str:
     마스터가 특정 도메인 지식이나 레시피, 법령 등을 구체적으로 물어볼 때 사용합니다.
     """
     # NotebookLM 연동 파트 (MCP Client 활용 예정)
-    # 현재는 인터페이스 스터브(Stub) 상태
     return f"[NotebookLM 응답 대기중] '{question}'에 대한 답변을 MCP 서버에서 가져올 예정입니다."
 
+@tool
+def search_obsidian(query: str) -> str:
+    """
+    마스터의 '제2의 뇌' (Obsidian Vault, 다수의 마크다운 파일)에서 키워드를 기반으로 노트 내용을 검색합니다.
+    마스터가 "노트 찾아봐", "옵시디언 찾아봐", "내 생각 확인해봐" 등 개인 지식을 확인하려 할 때 사용합니다.
+    """
+    vault_path = os.getenv("OBSIDIAN_VAULT_PATH")
+    if not vault_path or not os.path.exists(vault_path):
+        return f"오류: OBSIDIAN_VAULT_PATH({vault_path}) 가 잘못되었거나 설정되지 않았거나 폴더를 찾을 수 없습니다."
+    
+    results = []
+    # 단순 파일 순회 (간단한 grep 검색)
+    for root, dirs, files in os.walk(vault_path):
+        for file in files:
+            if file.endswith(".md"):
+                file_path = os.path.join(root, file)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        content = f.read()
+                        if query.lower() in content.lower():
+                            # 본문 일부 발췌
+                            idx = content.lower().find(query.lower())
+                            start = max(0, idx - 50)
+                            end = min(len(content), idx + 200)
+                            snippet = content[start:end].replace('\n', ' ')
+                            results.append(f"- [문서명: {file}] 연관 내용: ...{snippet}...")
+                except Exception:
+                    pass
+                    
+    if not results:
+        return f"'{query}'에 대한 노트를 옵시디언에서 찾지 못했습니다."
+    
+    return f"옵시디언 검색 결과 (최대 5개 발췌):\n" + "\n".join(results[:5])
+
+
 # 통합 반환용 리스트 (main.py에서 AgentExecutor/ToolNode에 주입)
-SENTINEL_TOOLS = [fetch_recent_emails, ask_notebooklm]
+SENTINEL_TOOLS = [fetch_recent_emails, ask_notebooklm, search_obsidian]

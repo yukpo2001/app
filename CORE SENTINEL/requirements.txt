@@ -9,3 +9,5 @@ pyngrok
 notion-client
 langchain-mcp-adapters
 mcp
+discord.py
+aiohttp
