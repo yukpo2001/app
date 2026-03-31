@@ -1,0 +1,301 @@
+:root {
+    --bg-dark: #050b14;
+    --neon-blue: #00f0ff;
+    --neon-blue-dim: rgba(0, 240, 255, 0.2);
+    --neon-red: #ff2a2a;
+    --glass-bg: rgba(10, 20, 35, 0.6);
+    --glass-border: rgba(0, 240, 255, 0.15);
+    --text-main: #e0f2fe;
+    --text-muted: #7dd3fc;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    /* Subtle background grid/glow */
+    background-image: 
+        radial-gradient(circle at 50% 0%, var(--neon-blue-dim), transparent 50%),
+        linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8));
+}
+
+.sentinel-container {
+    display: flex;
+    width: 95vw;
+    height: 90vh;
+    max-width: 1600px;
+    gap: 20px;
+}
+
+.glass-panel {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+}
+
+/* Sidebar */
+.sidebar {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    gap: 30px;
+}
+
+.brand {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.logo-glow {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: var(--neon-blue);
+    filter: blur(40px);
+    top: -10px;
+    left: -10px;
+    z-index: -1;
+}
+
+h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: #fff;
+    text-shadow: 0 0 10px var(--neon-blue);
+}
+
+.status-badge {
+    align-self: flex-start;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid var(--neon-blue);
+    color: var(--neon-blue);
+    letter-spacing: 1px;
+    box-shadow: 0 0 10px var(--neon-blue-dim);
+}
+
+.metrics {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.metric-card {
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    padding: 16px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.metric-card h3 {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.score-display {
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--neon-blue);
+    margin-bottom: 8px;
+    text-shadow: 0 0 15px var(--neon-blue-dim);
+    transition: color 0.3s ease, text-shadow 0.3s ease;
+}
+
+.score-display.danger {
+    color: var(--neon-red);
+    text-shadow: 0 0 20px rgba(255,42,42,0.4);
+}
+
+.progress-bar {
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--neon-blue);
+    box-shadow: 0 0 10px var(--neon-blue);
+    transition: width 0.5s cubic-bezier(0.1, 0.7, 0.1, 1), background 0.3s ease;
+}
+
+.progress-fill.danger {
+    background: var(--neon-red);
+    box-shadow: 0 0 10px var(--neon-red);
+}
+
+.status-text {
+    font-size: 1.2rem;
+    font-weight: 600;
+    letter-spacing: 2px;
+}
+
+.status-text.safe { color: var(--neon-blue); }
+.status-text.blocked { color: var(--neon-red); animation: pulse 1.5s infinite; }
+
+.system-logs {
+    flex-grow: 1;
+    background: rgba(0,0,0,0.4);
+    border-radius: 8px;
+    padding: 12px;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+
+.log-entry { margin-bottom: 6px; word-break: break-all; }
+.log-entry.error { color: var(--neon-red); }
+
+/* Main Console */
+.console {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+}
+
+.console-header {
+    border-bottom: 1px solid var(--glass-border);
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+}
+
+.console-header h2 {
+    font-size: 1.1rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 1px;
+}
+
+.chat-display {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding-right: 10px;
+    margin-bottom: 20px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 3px; }
+
+.msg {
+    max-width: 85%;
+    padding: 16px 20px;
+    border-radius: 12px;
+    line-height: 1.7;
+    animation: fadeIn 0.3s ease-out;
+    word-break: break-word;
+}
+
+.msg.user {
+    align-self: flex-end;
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-bottom-right-radius: 2px;
+}
+
+.msg.sentinel {
+    align-self: flex-start;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom-left-radius: 2px;
+}
+
+.msg.system-alert {
+    align-self: center;
+    background: rgba(255, 42, 42, 0.1);
+    border: 1px solid rgba(255, 42, 42, 0.3);
+    color: #ffb3b3;
+    text-align: center;
+    width: 100%;
+}
+
+.input-area {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+input {
+    flex-grow: 1;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid var(--glass-border);
+    padding: 16px 24px;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+input:focus {
+    outline: none;
+    border-color: var(--neon-blue);
+    box-shadow: 0 0 15px var(--neon-blue-dim);
+}
+
+button {
+    background: var(--neon-blue);
+    color: var(--bg-dark);
+    border: none;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 15px var(--neon-blue-dim);
+}
+
+button:hover:not(:disabled) {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px var(--neon-blue);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}

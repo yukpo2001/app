@@ -1,0 +1,22 @@
+# Environment variables
+.env
+
+# Logs and Scratch
+*.log
+output.txt
+output2.txt
+
+# Python artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# IDEs
+.vscode/
+.idea/
+
+# Virtual Environments
+venv/
+env/
+.venv/

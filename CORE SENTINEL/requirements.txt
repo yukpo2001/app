@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+langgraph
+langchain-openai
+python-dotenv
+pydantic
+aiofiles
+pyngrok
+notion-client
+langchain-mcp-adapters
+mcp
