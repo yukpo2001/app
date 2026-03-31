@@ -3,8 +3,12 @@
 
 # Logs and Scratch
 *.log
-output.txt
-output2.txt
+*.txt
+!requirements.txt
+
+# Local DB
+chroma_db/
+data/
 
 # Python artifacts
 __pycache__/

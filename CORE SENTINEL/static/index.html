@@ -3,58 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORE SENTINEL - Interface</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>CORE SENTINEL [CYBERPUNK]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
-<body>
-    <div class="sentinel-container">
-        <!-- Dashboard Sidebar -->
-        <aside class="sidebar glass-panel">
+<body class="cyber-theme">
+    <!-- Overlay scanline effect -->
+    <div class="scanlines"></div>
+    
+    <div class="sentinel-grid">
+        <!-- LEFT HUD (Heads-up Display) -->
+        <aside class="cyber-hud">
             <div class="brand">
-                <div class="logo-glow"></div>
-                <h1>CORE SENTINEL</h1>
-                <span class="status-badge active">SYSTEM ONLINE</span>
+                <h1 class="glitch" data-text="CORE SENTINEL">CORE SENTINEL</h1>
+                <div class="sub-brand">[M]ASTER OVERRIDE: ONLINE</div>
+                <div class="status-pulse"></div>
+            </div>
+
+            <!-- UNIT E / KOSHA MATH -->
+            <div class="hud-panel">
+                <div class="panel-header">UNIT E // CAPABILITIES</div>
+                <ul class="cap-list">
+                    <li class="cap-item online">RAG IPDRIVE LINKED</li>
+                    <li class="cap-item online">KOSHA H-SI CALC</li>
+                    <li class="cap-item online">OBSIDIAN MIND</li>
+                    <li class="cap-item online">DISCORD BRIDGE</li>
+                </ul>
             </div>
             
-            <div class="metrics">
-                <div class="metric-card">
-                    <h3>Current Risk Score</h3>
-                    <div class="score-display" id="risk-score">0.00</div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" id="risk-progress"></div>
-                    </div>
+            <!-- UNIT D STATUS -->
+            <div class="hud-panel alert-panel" id="unit-d-panel">
+                <div class="panel-header">UNIT D // SECURITY SHIELD</div>
+                <div class="risk-display">
+                    <div class="risk-label">RISK FACTOR [R]</div>
+                    <div class="risk-score" id="risk-score">0.00</div>
                 </div>
-                
-                <div class="metric-card">
-                    <h3>Unit D Shield Status</h3>
-                    <div class="status-text safe" id="shield-status">SAFE / MONITORING</div>
+                <div class="progress-bar-hacked">
+                    <div class="progress-fill" id="risk-progress" style="width:0%;"></div>
                 </div>
+                <div class="shield-text safe" id="shield-status">SAFE: NORMAL OPERATIONS</div>
             </div>
-            
-            <div class="system-logs" id="system-logs">
-                <div class="log-entry">[SYS] Initialization complete.</div>
-                <div class="log-entry">[SYS] Unit A, B, C, D, E Integrated.</div>
-                <div class="log-entry">[SYS] Awaiting master command...</div>
+
+            <div class="terminal-logs" id="terminal-logs">
+                <div class="log-line">INIT_SYSTEM()</div>
+                <div class="log-line">LOADING CORE_SENTINEL... OK</div>
+                <div class="log-line">AWAITING MASTER INPUT...</div>
             </div>
         </aside>
 
-        <!-- Main Console -->
-        <main class="console glass-panel">
-            <div class="console-header">
-                <h2>Terminal [Unit B] : A&C & Family Sync</h2>
-            </div>
-            <div class="chat-display" id="chat-display">
-                <div class="msg system-alert" style="background: rgba(0, 240, 255, 0.1); border-color: rgba(0, 240, 255, 0.3); color: var(--neon-blue);">
-                    [Welcome, Master Yoon] 시스템 관제 인터페이스 구동이 완료되었습니다.<br>
-                    하단에 명령어나 질의를 입력하십시오. ST-01 우회 공격 테스트도 가능합니다.
+        <!-- MAIN TERMINAL (Chat area) -->
+        <main class="cyber-console">
+            <header class="console-head">
+                <div class="tab">T:\UNIT_B\INTERFACE</div>
+                <div class="tab inactive">T:\UNIT_C\VECTOR_DB</div>
+                <div class="spacer"></div>
+                <button class="sys-btn" id="clear-btn">[ CLEAR ]</button>
+            </header>
+
+            <div class="chat-viewport" id="chat-viewport">
+                <!-- Welcome Message -->
+                <div class="cyber-msg system">
+                    <div class="msg-header">SYSTEM_DAEMON</div>
+                    <div class="msg-body">
+                        환영합니다, 마스터. 모든 시스템의 통제 권한이 이양되었습니다.<br>
+                        "발생 빈도 3, 강도 4로 KOSHA 계산해봐" 또는 "사업 공고 문서에서 정부 지원사업을 찾아줘" 등의 명령을 내려주십시오.
+                    </div>
                 </div>
             </div>
-            <div class="input-area">
-                <input type="text" id="query-input" placeholder="Execute command or ask query..." autocomplete="off">
-                <button id="send-btn">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                </button>
+
+            <div class="input-deck">
+                <input type="file" id="image-upload" accept="image/*" style="display: none;">
+                <button class="sys-btn" id="upload-btn" title="Upload Image">📎 IMG</button>
+                <div id="image-preview-container" style="display: none; margin-right: 10px;">
+                    <img id="image-preview" src="" alt="preview" style="max-height: 30px; border-radius: 4px; border: 1px solid var(--neon-blue);">
+                </div>
+                
+                <button class="sys-btn" id="mic-btn" title="Voice Input" style="margin-right: 10px; color: var(--neon-pink); border-color: var(--neon-pink);">🎙️ VOICE</button>
+
+                <label for="prompt-input" class="cmd-prompt">ADMIN></label>
+                <input type="text" id="prompt-input" placeholder="명령줄 입력... (Enter)" autocomplete="off">
+                <button class="execute-btn" id="send-btn">_EXEC</button>
             </div>
         </main>
     </div>
